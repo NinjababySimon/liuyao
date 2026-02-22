@@ -522,7 +522,9 @@ function copyPrompt(){
   const WX2_NAME=['金','水','木','火','土'];
   function dzWxLabel(dz){return dz+WX2_NAME[WX2[DZ_WX2[dz]]];}
   const yaoLines=yaos.map((v,i)=>{
-    let line=`${yaoNames[i]}：${lqArr[i]} ${dzWxLabel(allDZ[i])} ${mp[v]}`;
+    const isShi=(i+1)===hex.s, isYing=(i+1)===hex.y;
+    const prefix=isShi?`世在${yaoNames[i]}`:isYing?`應在${yaoNames[i]}`:yaoNames[i];
+    let line=`${prefix}：${lqArr[i]} ${dzWxLabel(allDZ[i])} ${mp[v]}`;
     if((v==='laoyang'||v==='laoyin')&&bDZ&&bDZ[i]){
       line+=` 化${lq2(gWx2,bDZ[i])}${dzWxLabel(bDZ[i])}`;
     }
