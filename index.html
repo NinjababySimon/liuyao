@@ -513,11 +513,23 @@ function copyPrompt(){
   const{hex,bHex,yaos,allDZ,lqArr,lunarI:li}=CG;
   const mp={yang:'陽',yin:'陰',laoyang:'老陽（動）',laoyin:'老陰（動）'};
   const yaoNames=['初爻','二爻','三爻','四爻','五爻','六爻'];
-  const yaoLines=yaos.map((v,i)=>`${yaoNames[i]}：${lqArr[i]} ${allDZ[i]} ${mp[v]}`).join('\n');
+  const{bDZ,fuShen,kongArr}=CG;
+  const WX2={'金':0,'水':1,'木':2,'火':3,'土':4};
+  const DZ_WX2={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  const GONG_WX2={'乾':'金','坎':'水','艮':'土','震':'木','巽':'木','離':'火','坤':'土','兌':'金'};
+  function lq2(gWx,dz){const g=WX2[gWx],d=WX2[DZ_WX2[dz]];if(g===d)return'兄弟';if((g+1)%5===d)return'子孫';if((d+1)%5===g)return'父母';if((g+2)%5===d)return'妻財';if((d+2)%5===g)return'官鬼';return'兄弟';}
+  const gWx2=GONG_WX2[hex.g];
+  const yaoLines=yaos.map((v,i)=>{
+    let line=`${yaoNames[i]}：${lqArr[i]} ${allDZ[i]} ${mp[v]}`;
+    if((v==='laoyang'||v==='laoyin')&&bDZ&&bDZ[i]){
+      line+=` 化${lq2(gWx2,bDZ[i])}${bDZ[i]}`;
+    }
+    return line;
+  }).join('\n');
   const dayGZ=li?li.dayGZ:'—';
   const monGZ=li?li.monthGZ:'—';
-  const bianStr=bHex&&bHex.n!==hex.n?`\n之卦：${bHex.n}`:'';
-  const prompt=`幫我預測一場賽事\n世為${st}，應為${yt}\n${dayGZ}日，${monGZ}月\n卦象為：${hex.n}${bianStr}\n\n${yaoLines}`;
+  const bianStr=bHex&&bHex.n!==hex.n?`\n變卦為：${bHex.n}`:'';
+  const prompt=`幫我預測一場賽事\n世為${st}，應為${yt}\n${dayGZ}日，${monGZ}月\n主卦為：${hex.n}${bianStr}\n\n${yaoLines}`;
   document.getElementById('copy-txt').textContent=prompt;
   document.getElementById('copy-box').style.display='block';
   navigator.clipboard.writeText(prompt).catch(()=>{});
