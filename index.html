@@ -431,7 +431,7 @@ function renderCard(){
   for(let i=5;i>=0;i--){
     const v=yaos[i],iD=v==='laoyang'||v==='laoyin';
     const iS=(i+1)===hex.s,iY=(i+1)===hex.y;
-    const bz=iD&&bDZ?bDZ[i]:'';
+    const bz=iD&&bDZ&&bDZ[i]?`${liuqin2(GONG_WX[hex.g],bDZ[i])}${bDZ[i]}`:'';
     const isKong=kSet.has(allDZ[i]);
     const dzLabel=`${allDZ[i]}${isKong?'<sup style="color:#c0392b;font-size:.65rem">空</sup>':''}`;
     const fuTxt=fuShen&&fuShen[i]?`<span style="color:#7b3fa0;font-size:.75rem">${fuShen[i]}</span>`:'';
@@ -471,7 +471,7 @@ function renderResult(){
   for(let i=5;i>=0;i--){
     const v=yaos[i],iD=v==='laoyang'||v==='laoyin';
     const iS=(i+1)===hex.s,iY=(i+1)===hex.y;
-    const bz=iD&&bDZ?bDZ[i]:'';
+    const bz=iD&&bDZ&&bDZ[i]?`${liuqin2(GONG_WX[hex.g],bDZ[i])}${bDZ[i]}`:'';
     const bd=i===2?'border-top:2px solid #1a1008;margin-top:4px':'';
     const isKong=kSet.has(allDZ[i]);
     const dzLabel=allDZ[i]+(isKong?'<sup style="color:#c0392b;font-size:.6rem">空</sup>':'');
