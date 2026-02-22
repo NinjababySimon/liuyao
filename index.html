@@ -510,7 +510,7 @@ function copyPrompt(){
   const st=document.getElementById('shi-t').value.trim();
   const yt=document.getElementById('ying-t').value.trim();
   if(!st||!yt){alert('請先填入世方（主隊）和應方（客隊）的隊伍名稱');return;}
-  const{hex,bHex,yaos,allDZ,lqArr,lunarI:li}=CG;
+  const{hex,bHex,yaos,allDZ,lqArr,sixG,lunarI:li}=CG;
   const mp={yang:'陽',yin:'陰',laoyang:'老陽（動）',laoyin:'老陰（動）'};
   const yaoNames=['初爻','二爻','三爻','四爻','五爻','六爻'];
   const{bDZ,fuShen,kongArr}=CG;
@@ -524,7 +524,7 @@ function copyPrompt(){
   const yaoLines=yaos.map((v,i)=>{
     const isShi=(i+1)===hex.s, isYing=(i+1)===hex.y;
     const prefix=isShi?`世在${yaoNames[i]}`:isYing?`應在${yaoNames[i]}`:yaoNames[i];
-    let line=`${prefix}：${lqArr[i]} ${dzWxLabel(allDZ[i])} ${mp[v]}`;
+    let line=`${prefix}：${lqArr[i]} ${dzWxLabel(allDZ[i])} ${sixG[i]} ${mp[v]}`;
     if((v==='laoyang'||v==='laoyin')&&bDZ&&bDZ[i]){
       line+=` 化${lq2(gWx2,bDZ[i])}${dzWxLabel(bDZ[i])}`;
     }
