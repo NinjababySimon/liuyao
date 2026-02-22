@@ -187,7 +187,7 @@ function s2l(yr,mo,da){
   const b2=new Date(1900,0,31);
   const td=Math.round((new Date(yr,mo-1,da)-b2)/86400000);
   const dti=((0+td)%10+10)%10;
-  const ddi=((0+td)%12+12)%12;
+  const ddi=((4+td)%12+12)%12; // 基準1900/1/31=甲辰，地支辰=4
   // 月干支（依節氣）
   const JIEQI_DAY=[6,4,6,5,6,6,7,7,8,8,7,7];
   const jDay=JIEQI_DAY[mo-1];
@@ -307,17 +307,18 @@ const HEX64={
 function findHex(s,x){return HEX64[s+x]||null;}
 
 // ══════ 六神 ══════
+// 《卜筮正宗》六神起法：甲乙青龍、丙丁朱雀、戊勾陳、己螣蛇、庚辛白虎、壬癸玄武
 const LIUSHEN={
   '甲':['青龍','朱雀','勾陳','螣蛇','白虎','玄武'],
-  '乙':['玄武','青龍','朱雀','勾陳','螣蛇','白虎'],
-  '丙':['白虎','玄武','青龍','朱雀','勾陳','螣蛇'],
-  '丁':['螣蛇','白虎','玄武','青龍','朱雀','勾陳'],
+  '乙':['青龍','朱雀','勾陳','螣蛇','白虎','玄武'],
+  '丙':['朱雀','勾陳','螣蛇','白虎','玄武','青龍'],
+  '丁':['朱雀','勾陳','螣蛇','白虎','玄武','青龍'],
   '戊':['勾陳','螣蛇','白虎','玄武','青龍','朱雀'],
-  '己':['青龍','朱雀','勾陳','螣蛇','白虎','玄武'],
-  '庚':['玄武','青龍','朱雀','勾陳','螣蛇','白虎'],
+  '己':['螣蛇','白虎','玄武','青龍','朱雀','勾陳'],
+  '庚':['白虎','玄武','青龍','朱雀','勾陳','螣蛇'],
   '辛':['白虎','玄武','青龍','朱雀','勾陳','螣蛇'],
-  '壬':['螣蛇','白虎','玄武','青龍','朱雀','勾陳'],
-  '癸':['勾陳','螣蛇','白虎','玄武','青龍','朱雀'],
+  '壬':['玄武','青龍','朱雀','勾陳','螣蛇','白虎'],
+  '癸':['玄武','青龍','朱雀','勾陳','螣蛇','白虎'],
 };
 
 // ══════ 爻輸入 ══════
@@ -386,14 +387,23 @@ function autoCalc(){
     const xunStart=((dIdx-tIdx)%12+12)%12;
     kongArr.push(DZ[(xunStart+10)%12],DZ[(xunStart+11)%12]);
   }
-  // 伏神
+  // 伏神（《卜筮正宗》：本卦缺某六親，去本宮首卦找，對應爻位藏伏神）
+  // 注意：靜爻六親 + 變爻六親都算「已上卦」，有動爻化出的六親不立伏神
   const pureL=getTriDZ(hex.g,false),pureU=getTriDZ(hex.g,true);
   const pureDZ=[...pureL,...pureU];
   const pureLQ=pureDZ.map(dz=>liuqin2(gWx,dz));
   const presentLQ=new Set(lqArr);
-  const fuShen=[];
+  // 變爻也計入已上卦
+  bDZ.forEach(dz=>{if(dz)presentLQ.add(liuqin2(gWx,dz));});
+  // 找本卦缺席的六親，每種六親只取純卦中第一個出現的爻位
+  const missingLQ=new Set(['父母','兄弟','子孫','妻財','官鬼'].filter(lq=>!presentLQ.has(lq)));
+  const fuShen=new Array(6).fill('');
+  const usedPos=new Set();
   for(let i=0;i<6;i++){
-    fuShen[i]=(pureLQ[i]!==lqArr[i]&&!presentLQ.has(pureLQ[i]))?`${pureLQ[i]}${pureDZ[i]}`:'';
+    if(missingLQ.has(pureLQ[i])&&!usedPos.has(pureLQ[i])){
+      fuShen[i]=`${pureLQ[i]}${pureDZ[i]}`;
+      usedPos.add(pureLQ[i]);
+    }
   }
   CG={hex,bHex,yaos,sixG,allDZ,bDZ,lqArr,lunarI:LI,shang,xia,kongArr,fuShen};
   renderCard();
