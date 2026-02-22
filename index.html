@@ -393,8 +393,12 @@ function autoCalc(){
   const pureDZ=[...pureL,...pureU];
   const pureLQ=pureDZ.map(dz=>liuqin2(gWx,dz));
   const presentLQ=new Set(lqArr);
-  // 變爻也計入已上卦
-  bDZ.forEach(dz=>{if(dz)presentLQ.add(liuqin2(gWx,dz));});
+  // 只有「動爻的變爻地支」才算已上卦（非整個之卦）
+  if(bDZ){
+    yaos.forEach((y,i)=>{
+      if(y==='laoyang'||y==='laoyin') presentLQ.add(liuqin2(gWx,bDZ[i]));
+    });
+  }
   // 找本卦缺席的六親，每種六親只取純卦中第一個出現的爻位
   const missingLQ=new Set(['父母','兄弟','子孫','妻財','官鬼'].filter(lq=>!presentLQ.has(lq)));
   const fuShen=new Array(6).fill('');
