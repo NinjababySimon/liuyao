@@ -1,0 +1,20 @@
+{
+  "name": "六爻體育預測系統",
+  "short_name": "六爻預測",
+  "description": "六爻納甲體育賽事預測工具",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f0e8",
+  "theme_color": "#1a1008",
+  "orientation": "portrait-primary",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
