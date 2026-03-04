@@ -104,7 +104,7 @@
       </div>
     </div>
     <table class="lt">
-      <thead><tr><th>爻位</th><th>六神</th><th>六親</th><th>地支</th><th>爻象</th><th>變爻</th><th>伏神</th><th>標記</th></tr></thead>
+      <thead><tr><th></th><th>爻位</th><th>六親</th><th>地支</th><th>爻象</th><th>變爻</th><th>伏神</th><th>動</th><th>六神</th></tr></thead>
       <tbody id="lt-b"></tbody>
     </table>
     <div style="margin-top:.5rem;font-size:.78rem;color:var(--faded)" id="notes"></div>
@@ -200,7 +200,7 @@ function s2l(yr,mo,da){
   return{year:ly,month:lm,day:ld,isLeap,yearGZ:TGN[si]+DBN[bi],
     monthStr:(isLeap?'閏':'')+CMN[lm-1]+'月',dayStr:CDN[ld-1],
     dayTian:TGN[dti],dayDi:DBN[ddi],
-    dayGZ:TGN[dti]+DBN[ddi],monthGZ:mTian+mDi};
+    dayGZ:TGN[dti]+DBN[ddi],monthGZ:mTian+mDi,monthDi:mDi};
 }
 
 // ══════ 八卦 ══════
@@ -382,10 +382,14 @@ function autoCalc(){
   const sixG=LIUSHEN[dayT]||LIUSHEN['甲'];
   // 空亡
   const kongArr=[];
+  let yuePoDi=null;
   if(LI){
     const tIdx=TGN.indexOf(LI.dayTian),dIdx=DZ.indexOf(LI.dayDi||'子');
     const xunStart=((dIdx-tIdx)%12+12)%12;
     kongArr.push(DZ[(xunStart+10)%12],DZ[(xunStart+11)%12]);
+    // 月破：月支對沖的地支
+    const mDiIdx=DZ.indexOf(LI.monthDi||'子');
+    yuePoDi=DZ[(mDiIdx+6)%12];
   }
   // 伏神（《卜筮正宗》：本卦缺某六親，去本宮首卦找，對應爻位藏伏神）
   // 注意：靜爻六親 + 變爻六親都算「已上卦」，有動爻化出的六親不立伏神
@@ -409,14 +413,14 @@ function autoCalc(){
       usedPos.add(pureLQ[i]);
     }
   }
-  CG={hex,bHex,yaos,sixG,allDZ,bDZ,lqArr,lunarI:LI,shang,xia,kongArr,fuShen};
+  CG={hex,bHex,yaos,sixG,allDZ,bDZ,lqArr,lunarI:LI,shang,xia,kongArr,yuePoDi,fuShen};
   renderCard();
 }
 function calcGua(){autoCalc();if(CG)sw('result');}
 
 function renderCard(){
   if(!CG)return;
-  const{hex,bHex,yaos,sixG,allDZ,bDZ,lqArr,kongArr,fuShen}=CG;
+  const{hex,bHex,yaos,sixG,allDZ,bDZ,lqArr,kongArr,yuePoDi,fuShen}=CG;
   document.getElementById('ben-n').textContent=hex.n;
   document.getElementById('gong-i').textContent=`宮：${hex.g}宮（${GONG_WX[hex.g]}）`;
   document.getElementById('tri-i').textContent=`（${CG.shang}上 / ${CG.xia}下）`;
@@ -433,15 +437,18 @@ function renderCard(){
     const iS=(i+1)===hex.s,iY=(i+1)===hex.y;
     const bz=iD&&bDZ&&bDZ[i]?`${liuqin2(GONG_WX[hex.g],bDZ[i])}${bDZ[i]}`:'';
     const isKong=kSet.has(allDZ[i]);
+    const isYuePo=yuePoDi&&allDZ[i]===yuePoDi;
     const dzLabel=`${allDZ[i]}${isKong?'<sup style="color:#c0392b;font-size:.65rem">空</sup>':''}`;
     const fuTxt=fuShen&&fuShen[i]?`<span style="color:#7b3fa0;font-size:.75rem">${fuShen[i]}</span>`:'';
     tb+=`<tr class="${i===2?'divr':''} ${iS?'sr':iY?'yr':''}">
-      <td>${YN[i]}</td><td>${sixG[i]}</td><td>${lqArr[i]}</td>
-      <td><strong>${dzLabel}</strong></td>
+      <td style="text-align:center">${iS?'<span class="ts">世</span>':iY?'<span class="ty">應</span>':''}</td>
+      <td>${YN[i]}</td><td>${lqArr[i]}</td>
+      <td><strong>${dzLabel}${isYuePo?'<sup style="color:#e67e22;font-size:.65rem">破</sup>':''}</strong></td>
       <td class="${cls[v]}">${sym[v]}</td>
       <td style="color:#c0392b;font-size:.8rem">${bz}</td>
       <td>${fuTxt}</td>
-      <td>${iS?'<span class="ts">世</span>':''}${iY?'<span class="ty">應</span>':''}${iD?'<span class="tdg">動</span>':''}</td>
+      <td>${iD?'<span class="tdg">動</span>':''}</td>
+      <td style="font-size:.8rem;color:#555">${sixG[i]}</td>
     </tr>`;
   }
   document.getElementById('lt-b').innerHTML=tb;
