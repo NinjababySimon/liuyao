@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>六爻卜卦</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700&family=ZCOOL+XiaoWei&display=swap');
+
+:root{
+  --ink:#1a1208;
+  --paper:#f7f2e8;
+  --aged:#ede5d0;
+  --crease:#d4c5a0;
+  --red:#8b1a1a;
+  --gold:#7a5c1e;
+  --faded:#9e8c6e;
+  --purple:#5b3a7e;
+  --shadow:rgba(26,18,8,.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Noto Serif TC',serif;
+  background:var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 10%,rgba(212,197,160,.4) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 90%,rgba(122,92,30,.1) 0%,transparent 50%);
+}
+
+/* ── Header ── */
+.hd{
+  text-align:center;
+  padding:2rem 1rem 1.2rem;
+  border-bottom:1px solid var(--crease);
+  background:linear-gradient(180deg,rgba(212,197,160,.3) 0%,transparent 100%);
+}
+.hd h1{
+  font-family:'ZCOOL XiaoWei',serif;
+  font-size:2rem;
+  letter-spacing:.3em;
+  color:var(--ink);
+}
+.hd p{font-size:.82rem;color:var(--faded);margin-top:.3rem;letter-spacing:.1em;}
+
+/* ── Tabs ── */
+.tabs{display:flex;border-bottom:1px solid var(--crease);background:var(--aged);}
+.tab{
+  flex:1;padding:.7rem .5rem;text-align:center;cursor:pointer;
+  font-size:.88rem;letter-spacing:.05em;color:var(--faded);
+  border-bottom:2px solid transparent;transition:all .2s;
+}
+.tab.act{color:var(--ink);border-bottom-color:var(--red);font-weight:500;}
+.panel{display:none;padding:1rem;max-width:680px;margin:0 auto;}
+.panel.act{display:block;}
+
+/* ── 輸入區 ── */
+.sec{margin-bottom:1.2rem;}
+.sec-label{font-size:.78rem;color:var(--faded);letter-spacing:.1em;margin-bottom:.5rem;}
+.inp{
+  width:100%;padding:.6rem .8rem;
+  border:1px solid var(--crease);border-radius:4px;
+  background:rgba(255,255,255,.7);color:var(--ink);
+  font-family:'Noto Serif TC',serif;font-size:.9rem;
+}
+textarea.inp{resize:vertical;min-height:70px;}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e8c6e' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .8rem center;padding-right:2rem;}
+
+.date-row{display:flex;gap:.5rem;}
+.date-row .inp{flex:1;}
+
+/* ── 爻選擇 ── */
+.yao-grid{display:flex;flex-direction:column;gap:.5rem;}
+.yao-row{display:flex;align-items:center;gap:.6rem;}
+.yao-lbl{width:2.8rem;font-size:.82rem;color:var(--faded);flex-shrink:0;text-align:right;}
+.yao-opts{display:flex;gap:.4rem;flex:1;}
+.yao-btn{
+  flex:1;padding:.45rem .3rem;text-align:center;cursor:pointer;
+  border:1px solid var(--crease);border-radius:3px;
+  font-size:.78rem;font-family:inherit;background:rgba(255,255,255,.6);
+  color:var(--faded);transition:all .15s;
+}
+.yao-btn:hover{border-color:var(--gold);color:var(--gold);}
+.yao-btn.sel{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.yao-btn.sel.c-ly,.yao-btn.sel.c-li{background:var(--red);border-color:var(--red);}
+
+/* ── 按鈕 ── */
+.brow{display:flex;gap:.6rem;flex-wrap:wrap;}
+.btn{
+  padding:.55rem 1.2rem;border:none;border-radius:4px;cursor:pointer;
+  font-family:inherit;font-size:.88rem;font-weight:500;letter-spacing:.05em;
+  transition:all .15s;
+}
+.btn-main{background:var(--ink);color:var(--paper);}
+.btn-main:hover{background:#2c1a0e;}
+.btn-sec{background:var(--aged);color:var(--ink);border:1px solid var(--crease);}
+.btn-sec:hover{background:var(--crease);}
+
+/* ── 卦象展示 ── */
+#gua-card{display:none;}
+.gua-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.8rem 1rem;background:var(--aged);border-radius:6px;
+  border:1px solid var(--crease);margin-bottom:1rem;
+}
+.gua-names{font-size:1.1rem;letter-spacing:.1em;}
+.gua-names .arrow{color:var(--faded);margin:0 .5rem;}
+.gua-meta{font-size:.75rem;color:var(--faded);text-align:right;}
+
+.lt{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:.8rem;}
+.lt th{
+  padding:.4rem .5rem;background:var(--ink);color:var(--paper);
+  font-weight:400;letter-spacing:.08em;font-size:.75rem;
+}
+.lt td{padding:.45rem .5rem;border-bottom:1px solid var(--aged);vertical-align:middle;}
+.lt tr.sr td{background:rgba(139,26,26,.06);}
+.lt tr.yr td{background:rgba(26,90,139,.06);}
+.lt tr.divr td{border-top:2px solid var(--ink);}
+.ts{background:var(--red);color:#fff;padding:1px 5px;border-radius:3px;font-size:.72rem;}
+.ty{background:#1a5a8b;color:#fff;padding:1px 5px;border-radius:3px;font-size:.72rem;}
+.tdg{background:var(--gold);color:#fff;padding:1px 5px;border-radius:3px;font-size:.72rem;}
+.dy{color:var(--ink);font-family:monospace;letter-spacing:2px;}
+.di{color:var(--faded);font-family:monospace;letter-spacing:2px;}
+.dd{color:var(--red);font-family:monospace;letter-spacing:2px;}
+
+.notes-bar{font-size:.78rem;color:var(--faded);line-height:1.9;margin-bottom:1rem;}
+
+/* ── 占問解析 ── */
+.interp{margin-top:1rem;}
+.interp-tabs{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem;}
+.itab{
+  padding:.35rem .7rem;border:1px solid var(--crease);border-radius:20px;
+  cursor:pointer;font-size:.8rem;color:var(--faded);background:rgba(255,255,255,.5);
+  transition:all .15s;
+}
+.itab:hover{border-color:var(--gold);color:var(--gold);}
+.itab.act{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+.interp-content{
+  background:rgba(255,255,255,.5);border:1px solid var(--crease);
+  border-radius:6px;padding:1rem;min-height:120px;
+}
+.interp-title{
+  font-size:.78rem;color:var(--faded);letter-spacing:.15em;
+  margin-bottom:.6rem;border-bottom:1px solid var(--crease);padding-bottom:.4rem;
+}
+.interp-body{font-size:.88rem;line-height:2;color:var(--ink);}
+.interp-body p{margin-bottom:.5rem;}
+
+/* ── 詢問文案 ── */
+#copy-box{
+  margin-top:1rem;background:rgba(255,255,255,.6);
+  border:1px solid var(--crease);border-radius:6px;padding:1rem;
+}
+#copy-txt{
+  font-family:inherit;font-size:.82rem;line-height:1.8;
+  white-space:pre-wrap;color:var(--ink);
+  background:var(--aged);padding:.8rem;border-radius:4px;
+  border:1px solid var(--crease);
+}
+
+/* toast */
+#toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(2rem);
+  background:var(--ink);color:var(--paper);padding:.5rem 1.2rem;
+  border-radius:20px;font-size:.82rem;opacity:0;pointer-events:none;
+  transition:all .3s;z-index:999;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <h1>六 爻 卜 卦</h1>
+  <p>依《黃金策》分類解析</p>
+</div>
+
+<div class="tabs">
+  <div class="tab act" onclick="sw('input')">起卦</div>
+  <div class="tab" onclick="sw('result')">卦象</div>
+  <div class="tab" onclick="sw('interp')">占問解析</div>
+</div>
+
+<!-- ── 起卦輸入 ── -->
+<div id="tab-input" class="panel act">
+
+  <div class="sec">
+    <div class="sec-label">占問事項</div>
+    <textarea class="inp" id="question" placeholder="請輸入占問的事情，例如：占此次求職能否順利…"></textarea>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">占問類別</div>
+    <div id="cat-grid" style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.2rem"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">占問日期</div>
+    <div class="date-row">
+      <input type="date" class="inp" id="gua-date">
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">六爻（初爻 → 六爻）</div>
+    <div class="yao-grid" id="yao-inputs"></div>
+  </div>
+
+  <div class="brow">
+    <button class="btn btn-main" onclick="calcAndShow()">⚡ 起卦</button>
+    <button class="btn btn-sec" onclick="copyPrompt()">📋 文案輸出</button>
+    <button class="btn btn-sec" onclick="clrF()">✕ 清空</button>
+  </div>
+</div>
+
+<!-- ── 卦象 ── -->
+<div id="tab-result" class="panel">
+  <div id="gua-card">
+    <div class="gua-head">
+      <div>
+        <div class="gua-names">
+          <span id="ben-n">—</span>
+          <span class="arrow" id="arr" style="display:none">→</span>
+          <span id="bian-n" style="display:none">—</span>
+        </div>
+        <div style="font-size:.75rem;color:var(--faded);margin-top:.2rem" id="gong-i">—</div>
+      </div>
+      <div class="gua-meta" id="gua-meta">—</div>
+    </div>
+    <table class="lt">
+      <thead><tr><th></th><th>爻位</th><th>六親</th><th>地支</th><th>爻象</th><th>變爻</th><th>伏神</th><th>動</th><th>六神</th></tr></thead>
+      <tbody id="lt-b"></tbody>
+    </table>
+    <div class="notes-bar" id="notes"></div>
+  </div>
+  <div id="res-empty" style="color:var(--faded);text-align:center;padding:3rem;font-size:.9rem;">請先在「起卦」輸入六爻</div>
+</div>
+
+<!-- ── 占問解析 ── -->
+<div id="tab-interp" class="panel">
+  <div id="interp-empty" style="color:var(--faded);text-align:center;padding:3rem;font-size:.9rem;">請先起卦後查看解析</div>
+  <div id="interp-area" style="display:none">
+    <div style="font-size:.78rem;color:var(--faded);margin-bottom:.8rem" id="interp-question"></div>
+    <div class="interp-tabs" id="interp-tabs"></div>
+    <div class="interp-content">
+      <div class="interp-title" id="interp-cat-title">—</div>
+      <div class="interp-body" id="interp-body">請選擇占問類別</div>
+    </div>
+    <div style="margin-top:1rem">
+      <button class="btn btn-main" onclick="copyPromptInterp()">📋 文案輸出</button>
+    </div>
+    <div id="copy-box" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.4rem">
+        <div style="font-size:.78rem;color:var(--faded)">《黃金策》占斷結果</div>
+        <button class="btn btn-sec" style="padding:.3rem .7rem;font-size:.78rem" onclick="copyResult()">📋 複製結果</button>
+      </div>
+      <div id="ai-result" style="background:var(--aged);border:1px solid var(--crease);border-radius:4px;padding:.8rem;min-height:80px;font-size:.85rem;line-height:1.8;white-space:pre-wrap;color:var(--ink);font-family:'Noto Serif TC',serif"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════ 複用核心計算 ══════
+</script>
+<script>
+// 以下從運動版複製的核心JS（s2l, HEX64, NAJIA, LIUSHEN等）會在這裡動態注入
+// 先定義佔位，實際由下方IIFE填入
+</script>
+
+<script>
+// ════════════════════════════════════
+// 核心計算（與運動版共用）
+// ════════════════════════════════════
+const TGN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const DBN=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const CMN=['正','二','三','四','五','六','七','八','九','十','十一','十二'];
+const CDN=['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+
+function lyD(y){
+  const d=[0x04AE53,0x0A5748,0x5526BD,0x0D2650,0x0D9544,0x46AAB9,0x056A4D,0x9AADDB,0x025D44,0x92D060,0x54D4B3,0x0A5648,0x0B6430,0x69814F,0x0D14B0,0x6C3723,0x056430,0x9543B1,0x0D5256,0x0DA473];
+  if(y>=1900&&y<1920)return(d[y-1900]>>9&0xFFF)*29+(d[y-1900]&0x1FF);
+  return 365+(y%4===0&&(y%100!==0||y%400===0)?1:0);
+}
+function s2l(yr,mo,da){
+  const date=new Date(yr,mo-1,da),base=new Date(1900,0,31);
+  let off=Math.round((date-base)/86400000),i,temp=0,ly=1900;
+  for(i=1900;i<2100&&off>0;i++){temp=lyD(i);off-=temp;ly=i;}
+  if(off<0){off+=temp;ly=i-1;}
+  const lDate=new Date(1900,0,31);
+  let lm=1,ld=1,isLeap=false;
+  const leapM=getLeap(ly);
+  for(let m=1;m<=12;m++){
+    const mDays=lmD(ly,m,false);
+    if(off<mDays){lm=m;ld=off+1;break;}
+    off-=mDays;
+    if(m===leapM){
+      const ld2=lmD(ly,m,true);
+      if(off<ld2){lm=m;ld=off+1;isLeap=true;break;}
+      off-=ld2;
+    }
+  }
+  const si=(yr-1900)*12%10+2,bi=(yr-1900)*12%12;
+  const adjMonth=(mo>2||(mo===2&&da>=4))?mo-2:mo+10;
+  const mTianBase=(si%10+adjMonth*2)%10;
+  const mTian=TGN[((Math.floor((yr-1900)%5)*2)+Math.floor(adjMonth/1))%10<0?((Math.floor((yr-1900)%5)*2)+Math.floor(adjMonth/1))%10+10:((Math.floor((yr-1900)%5)*2)+Math.floor(adjMonth/1))%10];
+  // 簡化月干支：
+  const yearStem=(yr-1900)%10;
+  const monthBase=[2,4,6,8,0,2,4,6,8,0]; // 甲己年正月=丙
+  const adjM=(mo>2||(mo===2&&da>=4))?mo-2:mo+10; // 大約，不精確按節氣
+  const mStemIdx=(monthBase[yearStem%10]+adjM-1)%10;
+  const mBranchIdx=(adjM+1)%12;
+  // 日干支
+  const dDiff=Math.round((new Date(yr,mo-1,da)-new Date(1900,0,31))/86400000);
+  const dti=((0+dDiff)%10+10)%10;
+  const ddi=((4+dDiff)%12+12)%12;
+  // 月干支（精確版）
+  const mti=mStemIdx,mdi=mBranchIdx;
+  return{year:ly,month:lm,day:ld,isLeap,
+    dayTian:TGN[dti],dayDi:DBN[ddi],dayGZ:TGN[dti]+DBN[ddi],
+    monthGZ:TGN[mti]+DBN[mdi],monthDi:DBN[mdi]};
+}
+function getLeap(y){return 0;}
+function lmD(y,m,isLeap){return 29;}
+
+// 精確月干支
+function getMonthGZ(yr,mo,da){
+  // 依年干推月干：甲己年正月起丙，每月加2；地支正月=寅
+  const JIEQI_DAY=[6,4,6,5,6,6,7,7,8,8,7,7]; // 各月節氣大約日期
+  const adjMo=(da>=JIEQI_DAY[mo-1])?mo:mo-1;
+  const m0=adjMo<=0?adjMo+12:adjMo;
+  const y0=adjMo<=0?yr-1:yr;
+  const yStem=(y0-1900)%10;
+  const baseStems=[2,4,6,8,0,2,4,6,8,0]; // 甲己年正月天干=丙(2)
+  const mStem=(baseStems[yStem]+(m0-1)*2)%10;
+  const mBranch=(m0+1)%12; // 正月=寅(2)
+  return{gz:TGN[mStem]+DBN[mBranch],di:DBN[mBranch]};
+}
+
+// ── 八卦 ──
+const TRI={'乾':[1,1,1],'兌':[1,1,0],'離':[1,0,1],'震':[1,0,0],'巽':[0,1,1],'坎':[0,1,0],'艮':[0,0,1],'坤':[0,0,0]};
+function findTri(a,b,c){for(const[n,y]of Object.entries(TRI))if(y[0]===a&&y[1]===b&&y[2]===c)return n;return null;}
+function toBase(v){return(v==='yang'||v==='laoyang')?1:0;}
+
+const NAJIA={
+  '乾':{inner:'子',outer:'午',dir:2},'坎':{inner:'寅',outer:'申',dir:2},
+  '艮':{inner:'辰',outer:'戌',dir:2},'震':{inner:'子',outer:'午',dir:2},
+  '巽':{inner:'丑',outer:'未',dir:-2},'離':{inner:'卯',outer:'酉',dir:-2},
+  '坤':{inner:'未',outer:'丑',dir:-2},'兌':{inner:'巳',outer:'亥',dir:-2}
+};
+const DZ=DBN;
+function dzStep(s,n,dir){const i=DZ.indexOf(s);return DZ[((i+dir*n)%12+12)%12];}
+function getTriDZ(tri,isOuter){const{inner,outer,dir}=NAJIA[tri];const s=isOuter?outer:inner;return[0,1,2].map(n=>dzStep(s,n,dir));}
+
+const GONG_WX={'乾':'金','坎':'水','艮':'土','震':'木','巽':'木','離':'火','坤':'土','兌':'金'};
+const WX_MAP={'金':0,'水':1,'木':2,'火':3,'土':4};
+const DZ_WX={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+const WX_NAME=['金','水','木','火','土'];
+
+function liuqin2(gWx,dz){
+  const g=WX_MAP[gWx],d=WX_MAP[DZ_WX[dz]];
+  if(g===d)return'兄弟';if((g+1)%5===d)return'子孫';if((d+1)%5===g)return'父母';
+  if((g+2)%5===d)return'妻財';if((d+2)%5===g)return'官鬼';return'兄弟';
+}
+
+const HEX64={
+  '乾乾':{g:'乾',s:6,y:3,n:'乾為天'},'乾巽':{g:'乾',s:1,y:4,n:'天風姤'},
+  '乾艮':{g:'乾',s:2,y:5,n:'天山遯'},'乾坤':{g:'乾',s:3,y:6,n:'天地否'},
+  '巽坤':{g:'乾',s:4,y:1,n:'風地觀'},'艮坤':{g:'乾',s:5,y:2,n:'山地剝'},
+  '離坤':{g:'乾',s:4,y:1,n:'火地晉'},'離乾':{g:'乾',s:3,y:6,n:'火天大有'},
+  '坎坎':{g:'坎',s:6,y:3,n:'坎為水'},'坎兌':{g:'坎',s:1,y:4,n:'水澤節'},
+  '坎震':{g:'坎',s:2,y:5,n:'水雷屯'},'坎離':{g:'坎',s:3,y:6,n:'水火既濟'},
+  '兌離':{g:'坎',s:4,y:1,n:'澤火革'},'震離':{g:'坎',s:5,y:2,n:'雷火豐'},
+  '坤離':{g:'坎',s:4,y:1,n:'地火明夷'},'坤坎':{g:'坎',s:3,y:6,n:'地水師'},
+  '艮艮':{g:'艮',s:6,y:3,n:'艮為山'},'艮離':{g:'艮',s:1,y:4,n:'山火賁'},
+  '艮乾':{g:'艮',s:2,y:5,n:'山天大畜'},'艮兌':{g:'艮',s:3,y:6,n:'山澤損'},
+  '離兌':{g:'艮',s:4,y:1,n:'火澤睽'},'乾兌':{g:'艮',s:5,y:2,n:'天澤履'},
+  '巽兌':{g:'艮',s:4,y:1,n:'風澤中孚'},'巽艮':{g:'艮',s:3,y:6,n:'風山漸'},
+  '震震':{g:'震',s:6,y:3,n:'震為雷'},'震坤':{g:'震',s:1,y:4,n:'雷地豫'},
+  '震坎':{g:'震',s:2,y:5,n:'雷水解'},'震巽':{g:'震',s:3,y:6,n:'雷風恒'},
+  '坤巽':{g:'震',s:4,y:1,n:'地風升'},'坎巽':{g:'震',s:5,y:2,n:'水風井'},
+  '兌巽':{g:'震',s:4,y:1,n:'澤風大過'},'兌震':{g:'震',s:3,y:6,n:'澤雷隨'},
+  '巽巽':{g:'巽',s:6,y:3,n:'巽為風'},'巽乾':{g:'巽',s:1,y:4,n:'風天小畜'},
+  '巽離':{g:'巽',s:2,y:5,n:'風火家人'},'巽震':{g:'巽',s:3,y:6,n:'風雷益'},
+  '乾震':{g:'巽',s:4,y:1,n:'天雷無妄'},'離震':{g:'巽',s:5,y:2,n:'火雷噬嗑'},
+  '艮震':{g:'巽',s:4,y:1,n:'山雷頤'},'艮巽':{g:'巽',s:3,y:6,n:'山風蠱'},
+  '離離':{g:'離',s:6,y:3,n:'離為火'},'離艮':{g:'離',s:1,y:4,n:'火山旅'},
+  '離巽':{g:'離',s:2,y:5,n:'火風鼎'},'離坎':{g:'離',s:3,y:6,n:'火水未濟'},
+  '艮坎':{g:'離',s:4,y:1,n:'山水蒙'},'巽坎':{g:'離',s:5,y:2,n:'風水渙'},
+  '乾坎':{g:'離',s:4,y:1,n:'天水訟'},'乾離':{g:'離',s:3,y:6,n:'天火同人'},
+  '坤坤':{g:'坤',s:6,y:3,n:'坤為地'},'坤震':{g:'坤',s:1,y:4,n:'地雷復'},
+  '坤兌':{g:'坤',s:2,y:5,n:'地澤臨'},'坤乾':{g:'坤',s:3,y:6,n:'地天泰'},
+  '震乾':{g:'坤',s:4,y:1,n:'雷天大壯'},'兌乾':{g:'坤',s:5,y:2,n:'澤天夬'},
+  '坎乾':{g:'坤',s:4,y:1,n:'水天需'},'坎坤':{g:'坤',s:3,y:6,n:'水地比'},
+  '兌兌':{g:'兌',s:6,y:3,n:'兌為澤'},'兌坎':{g:'兌',s:1,y:4,n:'澤水困'},
+  '兌坤':{g:'兌',s:2,y:5,n:'澤地萃'},'兌艮':{g:'兌',s:3,y:6,n:'澤山咸'},
+  '坎艮':{g:'兌',s:4,y:1,n:'水山蹇'},'坤艮':{g:'兌',s:5,y:2,n:'地山謙'},
+  '震艮':{g:'兌',s:4,y:1,n:'雷山小過'},'震兌':{g:'兌',s:3,y:6,n:'雷澤歸妹'},
+};
+
+// 《卜筮正宗》六神起法：甲乙青龍、丙丁朱雀、戊勾陳、己螣蛇、庚辛白虎、壬癸玄武
+const LIUSHEN={
+  '甲':['青龍','朱雀','勾陳','螣蛇','白虎','玄武'],
+  '乙':['青龍','朱雀','勾陳','螣蛇','白虎','玄武'],
+  '丙':['朱雀','勾陳','螣蛇','白虎','玄武','青龍'],
+  '丁':['朱雀','勾陳','螣蛇','白虎','玄武','青龍'],
+  '戊':['勾陳','螣蛇','白虎','玄武','青龍','朱雀'],
+  '己':['螣蛇','白虎','玄武','青龍','朱雀','勾陳'],
+  '庚':['白虎','玄武','青龍','朱雀','勾陳','螣蛇'],
+  '辛':['白虎','玄武','青龍','朱雀','勾陳','螣蛇'],
+  '壬':['玄武','青龍','朱雀','勾陳','螣蛇','白虎'],
+  '癸':['玄武','青龍','朱雀','勾陳','螣蛇','白虎'],
+};
+
+// ════════════════════════════════════
+// 《黃金策》占問類別與解析
+// ════════════════════════════════════
+// 六親用神對照
+const YONGSHEN={
+  '天時':'世爻、官爻',
+  '年時':'世爻、官爻、月爻',
+  '婚姻':'男占妻財為用，女占官鬼為用',
+  '求財':'妻財為用神',
+  '功名仕途':'官鬼為用神',
+  '求職謀事':'官鬼為用神，兄弟為忌神',
+  '行人音訊':'世爻或應爻',
+  '出行遠行':'世爻、應爻，財爻',
+  '疾病':'世爻為病者，官鬼為病源',
+  '訴訟官非':'官鬼為用神',
+  '買賣交易':'財爻為用神，兄弟為劫財',
+  '求子嗣':'子孫為用神',
+  '宅舍居住':'父母爻為屋宅，子孫為安寧',
+  '六畜牲口':'子孫為用神',
+  '尋人走失':'世爻為尋者，應爻為失者',
+};
+
+// 依宮與六親組合給出解析提示
+function getInterpText(catKey, hexName, gongName, gWx, lqArr, allDZ, yaos, hex, kongArr, yuePoDi){
+  const DZ_WX={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  const WX_MAP={'金':0,'水':1,'木':2,'火':3,'土':4};
+  const kongSet=new Set(kongArr||[]);
+  const yuePoSet=new Set(yuePoDi?[yuePoDi]:[]);
+  const YN=['初爻','二爻','三爻','四爻','五爻','六爻'];
+
+  // 找特定六親的爻位資訊
+  function findLQ(name){
+    return lqArr.map((lq,i)=>({lq,dz:allDZ[i],pos:i+1,posName:YN[i],
+      isDong:yaos[i]==='laoyang'||yaos[i]==='laoyin',
+      isKong:kongSet.has(allDZ[i]),isYuePo:yuePoSet.has(allDZ[i]),
+      isShi:(i+1)===hex.s,isYing:(i+1)===hex.y
+    })).filter(x=>x.lq===name);
+  }
+
+  const shiInfo=findLQ(lqArr[hex.s-1])[0]||{};
+  const shi=lqArr[hex.s-1], ying=lqArr[hex.y-1];
+  const shiDZ=allDZ[hex.s-1], yingDZ=allDZ[hex.y-1];
+  const shiKong=kongSet.has(shiDZ), yingKong=kongSet.has(yingDZ);
+  const shiYuePo=yuePoSet.has(shiDZ);
+
+  const cai=findLQ('妻財'), guan=findLQ('官鬼'), fu=findLQ('父母');
+  const xiong=findLQ('兄弟'), zi=findLQ('子孫');
+
+  const dong=lqArr.map((lq,i)=>(yaos[i]==='laoyang'||yaos[i]==='laoyin')?{lq,dz:allDZ[i],pos:i+1,posName:YN[i]}:null).filter(Boolean);
+
+  function statusStr(arr){
+    if(!arr.length)return'（卦中未見）';
+    return arr.map(x=>`${x.posName}${x.dz}${x.isKong?'空':x.isYuePo?'月破':x.isDong?'動':''}`).join('、');
+  }
+
+  const lines=[];
+
+  lines.push(`【主卦】${hexName}　【宮】${gongName}宮（${gWx}）`);
+  lines.push(`【世爻】${shi} ${shiDZ}${shiKong?'（空亡）':shiYuePo?'（月破）':''}　【應爻】${ying} ${yingDZ}${yingKong?'（空亡）':yuePoSet.has(yingDZ)?'（月破）':''}`);
+  lines.push('');
+
+  switch(catKey){
+    case '天時':
+      lines.push('▍天時（問天氣、時令）');
+      lines.push('用神：官鬼爻主風雨晦明。');
+      lines.push(`官鬼：${statusStr(guan)}`);
+      if(guan.some(x=>x.isDong))lines.push('官鬼動→天氣多變，或有風雨。');
+      if(guan.some(x=>x.isKong))lines.push('官鬼空亡→晴朗平靜。');
+      lines.push('父母爻主陰雲，子孫爻主晴明，世爻代表占者所在之氣候。');
+      break;
+    case '婚姻':
+      lines.push('▍婚姻（問婚嫁、感情）');
+      lines.push('男問：妻財為用神；女問：官鬼為用神。');
+      lines.push(`妻財：${statusStr(cai)}`);
+      lines.push(`官鬼：${statusStr(guan)}`);
+      if(cai.some(x=>x.isKong)||guan.some(x=>x.isKong))lines.push('用神空亡→緣分未到，或有阻礙。');
+      if(cai.some(x=>x.isDong)||guan.some(x=>x.isDong))lines.push('用神動→感情有進展或變動。');
+      lines.push('世應相生合→雙方情投意合；世應相剋→感情不順。');
+      break;
+    case '求財':
+      lines.push('▍求財（問財運、投資）');
+      lines.push('用神：妻財爻。兄弟爻為忌（劫財）。');
+      lines.push(`妻財：${statusStr(cai)}`);
+      lines.push(`兄弟（忌）：${statusStr(xiong)}`);
+      if(cai.some(x=>x.isKong))lines.push('財爻空亡→財來財去，難以留存。');
+      if(xiong.some(x=>x.isDong))lines.push('兄弟動→破財、競爭，財難聚。');
+      if(cai.some(x=>x.isDong))lines.push('財爻動→財源活躍，可有進財。');
+      break;
+    case '功名仕途':
+      lines.push('▍功名仕途（問考試、升遷）');
+      lines.push('用神：官鬼爻。父母爻為文書印信。');
+      lines.push(`官鬼：${statusStr(guan)}`);
+      lines.push(`父母（文書）：${statusStr(fu)}`);
+      if(guan.some(x=>x.isKong))lines.push('官鬼空亡→功名難就，考試不利。');
+      if(guan.some(x=>x.isDong))lines.push('官鬼動→仕途有動靜，或考試有望。');
+      if(fu.some(x=>x.isKong))lines.push('父母空亡→文書有阻，手續不全。');
+      break;
+    case '求職謀事':
+      lines.push('▍求職謀事（問求職、合作）');
+      lines.push('用神：官鬼爻。兄弟爻為競爭對手、阻礙。');
+      lines.push(`官鬼：${statusStr(guan)}`);
+      lines.push(`兄弟（競爭）：${statusStr(xiong)}`);
+      if(guan.some(x=>x.isKong))lines.push('官鬼空亡→職位虛，或對方無誠意。');
+      if(xiong.some(x=>x.isDong))lines.push('兄弟動→競爭激烈，阻礙多。');
+      break;
+    case '疾病':
+      lines.push('▍疾病（問病情、醫療）');
+      lines.push('用神：世爻代表病者。官鬼為病源、病邪。子孫為藥、醫生，能剋官鬼。');
+      lines.push(`世爻（病者）：${shi} ${shiDZ}${shiKong?'（空亡）':''}`);
+      lines.push(`官鬼（病邪）：${statusStr(guan)}`);
+      lines.push(`子孫（藥醫）：${statusStr(zi)}`);
+      if(zi.some(x=>x.isDong))lines.push('子孫動→用藥有效，病情轉好。');
+      if(zi.some(x=>x.isKong))lines.push('子孫空亡→藥石罔效，需謹慎。');
+      if(guan.some(x=>x.isDong))lines.push('官鬼動→病情加重或有變化。');
+      break;
+    case '訴訟官非':
+      lines.push('▍訴訟官非（問官司、糾紛）');
+      lines.push('用神：官鬼爻。世爻強旺為有利，應爻強旺為對方有利。');
+      lines.push(`官鬼：${statusStr(guan)}`);
+      lines.push(`世爻：${shi} ${shiDZ}${shiKong?'（空亡）':''}`);
+      lines.push(`應爻（對方）：${ying} ${yingDZ}${yingKong?'（空亡）':''}`);
+      if(shiKong)lines.push('世爻空亡→自身不利，宜和解。');
+      if(yingKong)lines.push('應爻空亡→對方理虧或退縮。');
+      break;
+    case '買賣交易':
+      lines.push('▍買賣交易（問生意、交易）');
+      lines.push('用神：妻財爻主利潤。兄弟爻為破財阻礙。');
+      lines.push(`妻財：${statusStr(cai)}`);
+      lines.push(`兄弟：${statusStr(xiong)}`);
+      if(cai.some(x=>x.isDong))lines.push('財爻動→交易活躍，利潤可期。');
+      if(xiong.some(x=>x.isDong))lines.push('兄弟動→有人從中作梗，或破財。');
+      break;
+    case '求子嗣':
+      lines.push('▍求子嗣（問生育、子女）');
+      lines.push('用神：子孫爻。子孫旺動則有子，空破則難。');
+      lines.push(`子孫：${statusStr(zi)}`);
+      if(zi.some(x=>x.isKong))lines.push('子孫空亡→近期難有子嗣消息。');
+      if(zi.some(x=>x.isDong))lines.push('子孫動→有懷孕或子女方面的喜訊。');
+      if(zi.length===0)lines.push('子孫爻不見於卦中，需查伏神。');
+      break;
+    case '宅舍居住':
+      lines.push('▍宅舍居住（問房屋、搬遷）');
+      lines.push('用神：父母爻為屋宅。子孫爻主居住安寧。');
+      lines.push(`父母（屋宅）：${statusStr(fu)}`);
+      lines.push(`子孫（安寧）：${statusStr(zi)}`);
+      if(fu.some(x=>x.isKong))lines.push('父母空亡→房屋有問題，或交易不成。');
+      if(zi.some(x=>x.isDong))lines.push('子孫動→居住安穩，家宅平安。');
+      break;
+    case '行人音訊':
+      lines.push('▍行人音訊（問外出之人、消息）');
+      lines.push('用神：應爻代表行人。父母爻主書信音訊。');
+      lines.push(`應爻（行人）：${ying} ${yingDZ}${yingKong?'（空亡）':''}`);
+      lines.push(`父母（音訊）：${statusStr(fu)}`);
+      if(yingKong)lines.push('應爻空亡→行人尚未歸，或音訊難得。');
+      if(fu.some(x=>x.isDong))lines.push('父母動→將有書信消息傳來。');
+      break;
+    case '出行遠行':
+      lines.push('▍出行遠行（問旅行、移居）');
+      lines.push('用神：世爻為占者，財爻為旅途利益，官鬼爻主途中阻礙。');
+      lines.push(`世爻：${shi} ${shiDZ}${shiKong?'（空亡）':''}`);
+      lines.push(`官鬼（障礙）：${statusStr(guan)}`);
+      if(shiKong)lines.push('世爻空亡→出行不利，宜延期。');
+      if(guan.some(x=>x.isDong))lines.push('官鬼動→途中有阻礙或意外，需謹慎。');
+      break;
+    case '尋人走失':
+      lines.push('▍尋人走失（問失蹤、走失）');
+      lines.push('用神：應爻代表失蹤之人，世爻為尋找者。');
+      lines.push(`世爻（尋者）：${shi} ${shiDZ}`);
+      lines.push(`應爻（失者）：${ying} ${yingDZ}${yingKong?'（空亡）':''}`);
+      if(yingKong)lines.push('應爻空亡→失者藏匿，難以尋得。');
+      lines.push('世應相合→容易尋回；世應相剋→難以找到。');
+      break;
+    case '六畜牲口':
+      lines.push('▍六畜牲口（問牲畜、動物）');
+      lines.push('用神：子孫爻主牲畜。');
+      lines.push(`子孫：${statusStr(zi)}`);
+      if(zi.some(x=>x.isKong))lines.push('子孫空亡→牲畜有損，或走失難尋。');
+      break;
+    default:
+      lines.push(`占問類別：${catKey}`);
+      lines.push(`用神參考：${YONGSHEN[catKey]||'—'}`);
+  }
+
+  lines.push('');
+  if(dong.length)lines.push(`【動爻】${dong.map(x=>`${x.posName}${x.lq}${x.dz}`).join('、')}動，需注意其化爻之影響。`);
+
+  return lines.join('\n');
+}
+
+// ════════════════════════════════════
+// UI 狀態
+// ════════════════════════════════════
+let CG=null;
+let currentCat='婚姻';
+
+const CATS=Object.keys(YONGSHEN);
+
+function sw(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('act',['input','result','interp'][i]===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('act'));
+  document.getElementById('tab-'+tab).classList.add('act');
+}
+
+// ── 爻輸入初始化 ──
+const YN=['初爻','二爻','三爻','四爻','五爻','六爻'];
+const YO=[
+  {v:'yang',l:'陽 ——',c:'c-y'},{v:'yin',l:'陰 – –',c:'c-i'},
+  {v:'laoyang',l:'老陽 ○',c:'c-ly'},{v:'laoyin',l:'老陰 ×',c:'c-li'}
+];
+
+function initY(){
+  const c=document.getElementById('yao-inputs');c.innerHTML='';
+  for(let i=0;i<6;i++){
+    const row=document.createElement('div');row.className='yao-row';
+    row.innerHTML=`<span class="yao-lbl">${YN[i]}</span><div class="yao-opts" id="yo${i}"></div>`;
+    c.appendChild(row);
+    const opts=document.getElementById('yo'+i);
+    YO.forEach(o=>{
+      const b=document.createElement('button');
+      b.className=`yao-btn ${o.c}`;b.textContent=o.l;b.dataset.v=o.v;
+      b.onclick=()=>{opts.querySelectorAll('.yao-btn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');tryAutoCalc();};
+      opts.appendChild(b);
+    });
+  }
+  // 預設今天
+  document.getElementById('gua-date').value=new Date().toISOString().slice(0,10);
+
+  // 初始化分類選擇器（起卦頁）
+  const catGrid=document.getElementById('cat-grid');
+  catGrid.innerHTML='';
+  CATS.forEach(cat=>{
+    const b=document.createElement('div');
+    b.className='itab'+(cat===currentCat?' act':'');
+    b.textContent=cat;
+    b.onclick=()=>{
+      currentCat=cat;
+      catGrid.querySelectorAll('.itab').forEach(x=>x.classList.remove('act'));
+      b.classList.add('act');
+      // 同步更新占問解析頁的選中狀態
+      if(CG)renderInterp();
+    };
+    catGrid.appendChild(b);
+  });
+}
+
+function getYaos(){
+  const r=[];
+  for(let i=0;i<6;i++){
+    const sel=document.querySelector(`#yo${i} .sel`);
+    if(sel)r.push(sel.dataset.v);
+  }
+  return r;
+}
+
+function tryAutoCalc(){if(getYaos().length===6)doCalc();}
+
+function clrF(){
+  document.querySelectorAll('.yao-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('question').value='';
+  CG=null;
+  document.getElementById('gua-card').style.display='none';
+  document.getElementById('res-empty').style.display='';
+  document.getElementById('interp-area').style.display='none';
+  document.getElementById('interp-empty').style.display='';
+  document.getElementById('copy-box').style.display='none';
+}
+
+function doCalc(){
+  const yaos=getYaos();
+  if(yaos.length!==6){showToast('請選擇六爻');return;}
+
+  const ds=document.getElementById('gua-date').value;
+  if(!ds){showToast('請選擇日期');return;}
+  const[yr,mo,da]=ds.split('-').map(Number);
+
+  // 干支計算
+  const base=new Date(1900,0,31);
+  const td=Math.round((new Date(yr,mo-1,da)-base)/86400000);
+  const dti=((0+td)%10+10)%10, ddi=((4+td)%12+12)%12;
+  const dayTian=TGN[dti], dayDi=DBN[ddi];
+
+  // 月干支（精確）
+  const mg=getMonthGZ(yr,mo,da);
+  const mTian=mg.gz[0], mDi=mg.gz[1], monthDi=mg.di;
+
+  const LI={dayTian,dayDi,dayGZ:dayTian+dayDi,monthGZ:mg.gz,monthDi};
+
+  // 找卦
+  const xia=findTri(toBase(yaos[0]),toBase(yaos[1]),toBase(yaos[2]));
+  const shang=findTri(toBase(yaos[3]),toBase(yaos[4]),toBase(yaos[5]));
+  if(!xia||!shang){showToast('爻象辨識失敗');return;}
+  const hex=HEX64[shang+xia];
+  if(!hex){showToast('找不到卦：'+shang+xia);return;}
+
+  // 之卦
+  const bxia=findTri(...[0,1,2].map(i=>(yaos[i]==='laoyang'?0:yaos[i]==='laoyin'?1:toBase(yaos[i]))));
+  const bshang=findTri(...[3,4,5].map(i=>(yaos[i]==='laoyang'?0:yaos[i]==='laoyin'?1:toBase(yaos[i]))));
+  const bHex=(bxia&&bshang)?HEX64[bshang+bxia]:null;
+  let bDZ=null;
+  if(bHex){bDZ=[...getTriDZ(bxia,false),...getTriDZ(bshang,true)];}
+
+  const gWx=GONG_WX[hex.g];
+  const allDZ=[...getTriDZ(xia,false),...getTriDZ(shang,true)];
+  const lqArr=allDZ.map(dz=>liuqin2(gWx,dz));
+  const sixG=(LIUSHEN[dayTian]||LIUSHEN['甲']);
+
+  // 空亡 & 月破
+  const xunStart=((ddi-dti)%12+12)%12;
+  const kongArr=[DBN[(xunStart+10)%12],DBN[(xunStart+11)%12]];
+  const mDiIdx=DBN.indexOf(monthDi);
+  const yuePoDi=DBN[(mDiIdx+6)%12];
+
+  // 伏神
+  const pureL=getTriDZ(hex.g,false),pureU=getTriDZ(hex.g,true);
+  const pureDZ=[...pureL,...pureU];
+  const pureLQ=pureDZ.map(dz=>liuqin2(gWx,dz));
+  const presentLQ=new Set(lqArr);
+  if(bDZ){yaos.forEach((y,i)=>{if(y==='laoyang'||y==='laoyin')presentLQ.add(liuqin2(gWx,bDZ[i]));});}
+  const missingLQ=new Set(['父母','兄弟','子孫','妻財','官鬼'].filter(lq=>!presentLQ.has(lq)));
+  const fuShen=new Array(6).fill('');
+  const usedPos=new Set();
+  for(let i=0;i<6;i++){if(missingLQ.has(pureLQ[i])&&!usedPos.has(pureLQ[i])){fuShen[i]=`${pureLQ[i]}${pureDZ[i]}`;usedPos.add(pureLQ[i]);}}
+
+  CG={hex,bHex,yaos,sixG,allDZ,bDZ,lqArr,lunarI:LI,shang,xia,kongArr,yuePoDi,fuShen};
+  renderCard();
+}
+
+function calcAndShow(){doCalc();if(CG){sw('result');}}
+
+function renderCard(){
+  if(!CG)return;
+  const{hex,bHex,yaos,sixG,allDZ,bDZ,lqArr,kongArr,yuePoDi,fuShen,lunarI:li}=CG;
+  document.getElementById('gua-card').style.display='block';
+  document.getElementById('res-empty').style.display='none';
+  document.getElementById('ben-n').textContent=hex.n;
+  document.getElementById('gong-i').textContent=`宮：${hex.g}宮（${GONG_WX[hex.g]}）`;
+  const hb=bHex&&bHex.n!==hex.n;
+  document.getElementById('arr').style.display=hb?'':'none';
+  const bianN=document.getElementById('bian-n');
+  bianN.style.display=hb?'':'none';if(hb)bianN.textContent=bHex.n;
+  document.getElementById('gua-meta').innerHTML=li?`${li.dayGZ}日<br>${li.monthGZ}月`:'';
+
+  const sym={yang:'──',yin:'– –',laoyang:'──○',laoyin:'– ×–'};
+  const cls={yang:'dy',yin:'di',laoyang:'dd',laoyin:'dd'};
+  const kSet=new Set(kongArr||[]);
+  let tb='';
+  for(let i=5;i>=0;i--){
+    const v=yaos[i],iD=v==='laoyang'||v==='laoyin';
+    const iS=(i+1)===hex.s,iY=(i+1)===hex.y;
+    const bz=iD&&bDZ&&bDZ[i]?`${liuqin2(GONG_WX[hex.g],bDZ[i])}${bDZ[i]}`:'';
+    const isKong=kSet.has(allDZ[i]);
+    const isYuePo=yuePoDi&&allDZ[i]===yuePoDi;
+    const dzWx=WX_NAME[WX_MAP[DZ_WX[allDZ[i]]]];
+    const dzLabel=`${allDZ[i]}${dzWx}${isKong?'<sup style="color:#c0392b;font-size:.65rem">空</sup>':isYuePo?'<sup style="color:#e67e22;font-size:.65rem">破</sup>':''}`;
+    const fuTxt=fuShen&&fuShen[i]?`<span style="color:#7b3fa0;font-size:.75rem">${fuShen[i]}</span>`:'';
+    tb+=`<tr class="${i===2?'divr':''} ${iS?'sr':iY?'yr':''}">
+      <td style="text-align:center">${iS?'<span class="ts">世</span>':iY?'<span class="ty">應</span>':''}</td>
+      <td>${YN[i]}</td><td>${lqArr[i]}</td>
+      <td><strong>${dzLabel}</strong></td>
+      <td class="${cls[v]}">${sym[v]}</td>
+      <td style="color:#c0392b;font-size:.8rem">${bz}</td>
+      <td>${fuTxt}</td>
+      <td>${iD?'<span class="tdg">動</span>':''}</td>
+      <td style="font-size:.8rem;color:#555">${sixG[i]}</td>
+    </tr>`;
+  }
+  document.getElementById('lt-b').innerHTML=tb;
+
+  const dongs=yaos.map((v,i)=>(v==='laoyang'||v==='laoyin')?YN[i]:null).filter(Boolean);
+  const ns=[];
+  if(dongs.length)ns.push('動爻：'+dongs.join('、'));
+  ns.push(`世：${YN[hex.s-1]}（${lqArr[hex.s-1]} ${allDZ[hex.s-1]}）`);
+  ns.push(`應：${YN[hex.y-1]}（${lqArr[hex.y-1]} ${allDZ[hex.y-1]}）`);
+  ns.push(`旬空：${(kongArr||[]).join('、')}`);
+  if(yuePoDi)ns.push(`月破：${yuePoDi}`);
+  document.getElementById('notes').textContent=ns.join('　');
+
+  renderInterp();
+}
+
+function renderInterp(){
+  if(!CG)return;
+  document.getElementById('interp-empty').style.display='none';
+  document.getElementById('interp-area').style.display='block';
+  const q=document.getElementById('question').value.trim();
+  document.getElementById('interp-question').textContent=q?`占問：${q}`:'';
+
+  // 分類Tab
+  const tabsEl=document.getElementById('interp-tabs');
+  tabsEl.innerHTML='';
+  CATS.forEach(cat=>{
+    const b=document.createElement('div');
+    b.className='itab'+(cat===currentCat?' act':'');
+    b.textContent=cat;
+    b.onclick=()=>{
+      currentCat=cat;
+      renderInterp();
+      // 同步起卦頁分類選中
+      const cg=document.getElementById('cat-grid');
+      if(cg)cg.querySelectorAll('.itab').forEach(x=>x.classList.toggle('act',x.textContent===cat));
+    };
+    tabsEl.appendChild(b);
+  });
+
+  const{hex,allDZ,lqArr,yaos,kongArr,yuePoDi,lunarI:li}=CG;
+  const gWx=GONG_WX[hex.g];
+  document.getElementById('interp-cat-title').textContent=`${currentCat}　用神：${YONGSHEN[currentCat]||'—'}`;
+  const text=HJCDB.analyze(currentCat,hex.n,hex.g,gWx,lqArr,allDZ,yaos,hex,kongArr,yuePoDi,li);
+  document.getElementById('interp-body').innerHTML=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>');
+}
+
+// ══════════════════════════════════════════════════════
+// 《黃金策》本地資料庫
+// 依卦宮、用神狀態、動靜、空破月破生成完整分析文字
+// ══════════════════════════════════════════════════════
+
+const HJCDB = {
+
+  // ── 五行生剋 ──
+  _wxSheng(a, b) { // a 生 b？
+    const s = {'木':'火','火':'土','土':'金','金':'水','水':'木'};
+    return s[a] === b;
+  },
+  _wxKe(a, b) { // a 剋 b？
+    const k = {'木':'土','土':'水','水':'火','火':'金','金':'木'};
+    return k[a] === b;
+  },
+  _dzWx(dz) {
+    return {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'}[dz];
+  },
+
+  // ── 日月對爻的生剋關係文字 ──
+  _dayMonthEffect(dz, dayDi, monthDi) {
+    const tips = [];
+    const dzWx = this._dzWx(dz);
+    const dayWx = this._dzWx(dayDi);
+    const monWx = this._dzWx(monthDi);
+    if (dayDi === dz) tips.push('日建臨爻（日旺）');
+    else if (this._wxSheng(dayWx, dzWx)) tips.push('日生');
+    else if (this._wxKe(dayWx, dzWx)) tips.push('日剋');
+    else if (this._wxKe(dzWx, dayWx)) tips.push('日洩');
+    if (monthDi === dz) tips.push('月建臨爻（月旺）');
+    else if (this._wxSheng(monWx, dzWx)) tips.push('月生');
+    else if (this._wxKe(monWx, dzWx)) tips.push('月剋');
+    return tips.join('、') || '日月無直接生剋';
+  },
+
+  // ── 爻旺衰判斷 ──
+  _wangShuai(dz, isDong, isKong, isYuePo, dayDi, monthDi) {
+    if (isKong) return '空亡（力量消失，需出空後方驗）';
+    if (isYuePo) return '月破（被月令沖破，力量受損）';
+    const dzWx = this._dzWx(dz);
+    const dayWx = this._dzWx(dayDi);
+    const monWx = this._dzWx(monthDi);
+    const parts = [];
+    if (monthDi === dz) parts.push('月令旺相');
+    else if (this._wxSheng(monWx, dzWx)) parts.push('月生旺');
+    else if (this._wxKe(monWx, dzWx)) parts.push('月剋衰');
+    if (dayDi === dz) parts.push('日建旺');
+    else if (this._wxSheng(dayWx, dzWx)) parts.push('日生助');
+    else if (this._wxKe(dayWx, dzWx)) parts.push('日剋制');
+    if (isDong) parts.push('動爻有力');
+    return parts.join('，') || '平和';
+  },
+
+  // ── 世應關係 ──
+  _shiYingRel(shiDZ, yingDZ) {
+    const shiWx = this._dzWx(shiDZ);
+    const yingWx = this._dzWx(yingDZ);
+    // 六合地支對
+    const he6 = [['子','丑'],['寅','亥'],['卯','戌'],['辰','酉'],['巳','申'],['午','未']];
+    const chong = [['子','午'],['丑','未'],['寅','申'],['卯','酉'],['辰','戌'],['巳','亥']];
+    for (const p of he6) if ((p[0]===shiDZ&&p[1]===yingDZ)||(p[1]===shiDZ&&p[0]===yingDZ)) return '世應六合（雙方和諧，事易成）';
+    for (const p of chong) if ((p[0]===shiDZ&&p[1]===yingDZ)||(p[1]===shiDZ&&p[0]===yingDZ)) return '世應相沖（雙方對立，阻礙較多）';
+    if (this._wxSheng(shiWx, yingWx)) return '世生應（我方付出，利對方）';
+    if (this._wxSheng(yingWx, shiWx)) return '應生世（對方有利於我）';
+    if (this._wxKe(shiWx, yingWx)) return '世剋應（我方主動，可掌控）';
+    if (this._wxKe(yingWx, shiWx)) return '應剋世（對方佔優，自身受制）';
+    return '世應比和（力量相當）';
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 主分析函數
+  // ══════════════════════════════════════════════════════
+  analyze(catKey, hexName, gongName, gWx, lqArr, allDZ, yaos, hex, kongArr, yuePoDi, lunarI) {
+    const kongSet = new Set(kongArr || []);
+    const yuePoSet = new Set(yuePoDi ? [yuePoDi] : []);
+    const YN = ['初爻','二爻','三爻','四爻','五爻','六爻'];
+    const dayDi = lunarI?.dayDi || '子';
+    const monthDi = lunarI?.monthDi || '子';
+    const dayGZ = lunarI?.dayGZ || '—';
+    const monGZ = lunarI?.monthGZ || '—';
+
+    // 找六親
+    const findLQ = name => lqArr.map((lq,i) => ({
+      lq, dz: allDZ[i], pos: i+1, posName: YN[i],
+      isDong: yaos[i]==='laoyang'||yaos[i]==='laoyin',
+      isKong: kongSet.has(allDZ[i]),
+      isYuePo: yuePoSet.has(allDZ[i]),
+      isShi: (i+1)===hex.s, isYing: (i+1)===hex.y,
+    })).filter(x => x.lq === name);
+
+    const cai = findLQ('妻財'), guan = findLQ('官鬼');
+    const fu = findLQ('父母'), xiong = findLQ('兄弟'), zi = findLQ('子孫');
+
+    const shiDZ = allDZ[hex.s-1], yingDZ = allDZ[hex.y-1];
+    const shiLQ = lqArr[hex.s-1], yingLQ = lqArr[hex.y-1];
+    const shiKong = kongSet.has(shiDZ), yingKong = kongSet.has(yingDZ);
+    const shiYuePo = yuePoSet.has(shiDZ), yingYuePo = yuePoSet.has(yingDZ);
+    const shiDong = yaos[hex.s-1]==='laoyang'||yaos[hex.s-1]==='laoyin';
+
+    const dong = lqArr.map((lq,i) =>
+      (yaos[i]==='laoyang'||yaos[i]==='laoyin') ? {lq, dz:allDZ[i], pos:i+1, posName:YN[i]} : null
+    ).filter(Boolean);
+
+    // 爻描述輔助
+    const lqStatus = arr => {
+      if (!arr.length) return '卦中未見（需查伏神）';
+      return arr.map(x => {
+        const ws = this._wangShuai(x.dz, x.isDong, x.isKong, x.isYuePo, dayDi, monthDi);
+        const dm = this._dayMonthEffect(x.dz, dayDi, monthDi);
+        let s = `${x.posName} ${x.dz}（${ws}`;
+        if (x.isDong) s += '，動';
+        s += `，${dm}）`;
+        return s;
+      }).join('\n    ');
+    };
+
+    const shiStatus = this._wangShuai(shiDZ, shiDong, shiKong, shiYuePo, dayDi, monthDi);
+    const yingStatus = this._wangShuai(yingDZ, false, yingKong, yingYuePo, dayDi, monthDi);
+    const shiYingRel = this._shiYingRel(shiDZ, yingDZ);
+
+    const lines = [];
+
+    // ── 共用標頭 ──
+    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    lines.push(`《黃金策》${catKey} 占斷`);
+    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    lines.push(`卦名：${hexName}　宮：${gongName}宮（${gWx}）`);
+    lines.push(`占卜日：${dayGZ}　月：${monGZ}`);
+    lines.push(`旬空：${(kongArr||[]).join('、') || '無'}　月破：${yuePoDi || '無'}`);
+    lines.push('');
+    lines.push(`【世爻】${YN[hex.s-1]} ${shiLQ} ${shiDZ}　${shiStatus}`);
+    lines.push(`【應爻】${YN[hex.y-1]} ${yingLQ} ${yingDZ}　${yingStatus}`);
+    lines.push(`【世應關係】${shiYingRel}`);
+    if (dong.length) lines.push(`【動爻】${dong.map(x=>`${x.posName}${x.lq}${x.dz}`).join('、')}`);
+    lines.push('');
+
+    // ── 各類別分析 ──
+    switch(catKey) {
+
+      case '天時': {
+        lines.push('▌用神：官鬼爻主風雨晦冥；父母爻主陰雲；子孫爻主晴明');
+        lines.push('');
+        lines.push(`◆ 官鬼（主風雨）：\n    ${lqStatus(guan)}`);
+        lines.push(`◆ 父母（主陰雲）：\n    ${lqStatus(fu)}`);
+        lines.push(`◆ 子孫（主晴明）：\n    ${lqStatus(zi)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・官鬼旺動→多風雨，天氣惡劣；官鬼靜而弱→天氣平穩');
+        lines.push('・父母持世或動→陰雲密佈，多霧或雨');
+        lines.push('・子孫持世或旺動→晴天，天氣好轉');
+        if (guan.some(x=>x.isDong)) lines.push('→ 官鬼動：近期風雨較多，天氣有變');
+        if (guan.some(x=>x.isKong)) lines.push('→ 官鬼空亡：晴朗少雨，天氣穩定');
+        if (zi.some(x=>x.isDong)) lines.push('→ 子孫動：天氣轉晴，宜出行');
+        if (fu.some(x=>x.isDong)) lines.push('→ 父母動：陰雲遮日，可能有雨');
+        break;
+      }
+
+      case '年時': {
+        lines.push('▌用神：世爻代表問卜者，官鬼爻主年中吉凶變化');
+        lines.push('　　　　父母爻主文書、長輩，子孫爻主平安順遂');
+        lines.push('');
+        lines.push(`◆ 官鬼（吉凶變化）：\n    ${lqStatus(guan)}`);
+        lines.push(`◆ 子孫（平安）：\n    ${lqStatus(zi)}`);
+        lines.push(`◆ 父母（文書長輩）：\n    ${lqStatus(fu)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・世爻旺相→一年中自身狀況良好');
+        lines.push('・子孫持世或旺→整年平安少災');
+        lines.push('・官鬼動剋世→年中有災厄或官訟');
+        lines.push('・兄弟動→年內有破財之事');
+        lines.push('・父母動→有文書、考試、房屋方面的事');
+        if (shiKong) lines.push('→ 世爻空亡：本年對問卜者而言，自身力量不足，宜低調行事');
+        if (guan.some(x=>x.isDong)) lines.push('→ 官鬼動：年中有官訟、疾病或意外需防');
+        if (zi.some(x=>x.isDong&&!x.isKong)) lines.push('→ 子孫動：有喜慶之事，或添丁之兆');
+        if (xiong.some(x=>x.isDong)) lines.push('→ 兄弟動：防財物損失，或有口舌是非');
+        break;
+      }
+
+      case '婚姻': {
+        lines.push('▌用神：男占問婚姻→妻財為用神；女占問婚姻→官鬼為用神');
+        lines.push('　　　　世爻代表自身，應爻代表對方');
+        lines.push('');
+        lines.push(`◆ 妻財（男方用神/女方之夫星）：\n    ${lqStatus(cai)}`);
+        lines.push(`◆ 官鬼（女方用神/男方之妻星）：\n    ${lqStatus(guan)}`);
+        lines.push(`◆ 父母（婚書媒人）：\n    ${lqStatus(fu)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・用神旺相持世→婚姻美滿，對方條件好');
+        lines.push('・用神空破→緣分未至，婚事難成');
+        lines.push('・世應相合→雙方情投意合，有緣');
+        lines.push('・世應相沖→感情有阻，難以長久');
+        lines.push('・父母爻動合世→有媒人促成，婚事可成');
+        lines.push('・兄弟爻動→有第三者介入，或破壞婚事');
+        if ((cai.some(x=>x.isKong))||(guan.some(x=>x.isKong))) lines.push('→ 用神空亡：此時求婚不宜，緣分尚未成熟');
+        if ((cai.some(x=>x.isYuePo))||(guan.some(x=>x.isYuePo))) lines.push('→ 用神月破：婚事遭遇阻礙，需等時機');
+        if ((cai.some(x=>x.isDong&&!x.isKong))||(guan.some(x=>x.isDong&&!x.isKong))) lines.push('→ 用神動：感情有進展，婚事有望推進');
+        if (xiong.some(x=>x.isDong)) lines.push('→ 兄弟動：防有競爭者或第三者破壞婚事');
+        if (fu.some(x=>x.isDong&&!x.isKong)) lines.push('→ 父母動：婚書合同可成，媒人促成');
+        lines.push('');
+        lines.push(`◆ 世應關係：${shiYingRel}`);
+        break;
+      }
+
+      case '求財': {
+        lines.push('▌用神：妻財爻。原神：子孫爻（生財）。忌神：兄弟爻（劫財）');
+        lines.push('　　　　仇神：父母爻（剋子孫）');
+        lines.push('');
+        lines.push(`◆ 妻財（用神）：\n    ${lqStatus(cai)}`);
+        lines.push(`◆ 子孫（原神，生財）：\n    ${lqStatus(zi)}`);
+        lines.push(`◆ 兄弟（忌神，劫財）：\n    ${lqStatus(xiong)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・財爻旺相持世→財源豐厚，求財可得');
+        lines.push('・財爻空破→財來財去，難以留存；或求財不遇');
+        lines.push('・子孫旺動生財→財源不斷，進財順遂');
+        lines.push('・兄弟持世→自身財運受阻，易破財');
+        lines.push('・兄弟動→有人與我爭財，或意外破財');
+        lines.push('・父母持世→求財不順，文書牽制財');
+        if (cai.some(x=>x.isKong)) lines.push('→ 財爻空亡：近期財運弱，暫不宜大筆投資');
+        if (cai.some(x=>x.isYuePo)) lines.push('→ 財爻月破：財被月令破壞，此月求財不利');
+        if (cai.some(x=>x.isDong&&!x.isKong)) lines.push('→ 財爻動：財源活躍，主動出擊可得財');
+        if (zi.some(x=>x.isDong&&!x.isKong)) lines.push('→ 子孫動生財：財運佳，有意外之財');
+        if (xiong.some(x=>x.isDong)) lines.push('→ 兄弟動：防破財、被人分利或欺詐');
+        if (lqArr[hex.s-1]==='兄弟') lines.push('→ 世持兄弟：自身財運差，求財阻力大');
+        break;
+      }
+
+      case '功名仕途': {
+        lines.push('▌用神：官鬼爻（代表功名官職）。原神：妻財爻（生官）');
+        lines.push('　　　　父母爻：文書印信，輔助用神');
+        lines.push('　　　　忌神：子孫爻（剋官）；仇神：兄弟爻（剋財，間接傷官）');
+        lines.push('');
+        lines.push(`◆ 官鬼（用神）：\n    ${lqStatus(guan)}`);
+        lines.push(`◆ 父母（文書印信）：\n    ${lqStatus(fu)}`);
+        lines.push(`◆ 妻財（原神）：\n    ${lqStatus(cai)}`);
+        lines.push(`◆ 子孫（忌神）：\n    ${lqStatus(zi)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・官鬼旺相持世→仕途順遂，考試有望');
+        lines.push('・官鬼空破→功名難成，考試不利');
+        lines.push('・父母旺動→文書到手，有任命或通知');
+        lines.push('・父母空破→文書有阻，證件出問題');
+        lines.push('・子孫動剋官→功名受阻，不宜求取官職');
+        lines.push('・世持官鬼旺→自身有官威，適合謀求升遷');
+        if (guan.some(x=>x.isKong)) lines.push('→ 官鬼空亡：功名虛而不實，考試難上榜');
+        if (guan.some(x=>x.isDong&&!x.isKong)) lines.push('→ 官鬼動：仕途有大變動，或有升遷機會');
+        if (fu.some(x=>x.isDong&&!x.isKong)) lines.push('→ 父母動：文書、證書、任命書有動靜，好消息可期');
+        if (fu.some(x=>x.isKong)) lines.push('→ 父母空亡：文書缺失或有誤，手續不全');
+        if (zi.some(x=>x.isDong)) lines.push('→ 子孫動剋官：此時不利謀取功名，宜暫緩');
+        break;
+      }
+
+      case '求職謀事': {
+        lines.push('▌用神：官鬼爻（職位工作）。忌神：兄弟爻（競爭阻礙）');
+        lines.push('　　　　世爻代表求職者，應爻代表雇主或合作方');
+        lines.push('');
+        lines.push(`◆ 官鬼（職位）：\n    ${lqStatus(guan)}`);
+        lines.push(`◆ 兄弟（競爭）：\n    ${lqStatus(xiong)}`);
+        lines.push(`◆ 父母（合同文書）：\n    ${lqStatus(fu)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・官鬼持世旺相→自身適合此工作，可得職');
+        lines.push('・官鬼空破→職位虛，或對方無誠意');
+        lines.push('・應爻旺→對方（雇主）條件好；應爻空破→雇主不可靠');
+        lines.push('・世應相生→合作愉快，雙方互利');
+        lines.push('・兄弟動→競爭激烈，有阻礙或被人搶先');
+        lines.push('・父母動→合同文書有消息，手續進展');
+        if (guan.some(x=>x.isKong)) lines.push('→ 官鬼空亡：職位不穩，或是假職缺');
+        if (xiong.some(x=>x.isDong)) lines.push('→ 兄弟動：競爭激烈，須加倍努力；或有人從中阻撓');
+        if (fu.some(x=>x.isDong&&!x.isKong)) lines.push('→ 父母動：合同有望簽訂，手續在進行中');
+        if (yingKong) lines.push('→ 應爻空亡：雇主條件虛，對方未有誠意');
+        lines.push('');
+        lines.push(`◆ 世應關係：${shiYingRel}`);
+        break;
+      }
+
+      case '行人音訊': {
+        lines.push('▌用神：應爻代表行人（外出之人）。父母爻主書信音訊');
+        lines.push('　　　　問行人消息→以應爻為主，父母爻為輔');
+        lines.push('');
+        lines.push(`◆ 應爻（行人）：${yingLQ} ${yingDZ}　${yingStatus}`);
+        lines.push(`◆ 父母（音訊書信）：\n    ${lqStatus(fu)}`);
+        lines.push(`◆ 官鬼（阻礙）：\n    ${lqStatus(guan)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・應爻旺動→行人即將到來，或消息即至');
+        lines.push('・應爻空破→行人尚遠，或消息難得；空亡→行人躲避不欲相見');
+        lines.push('・父母動→書信音訊將至，有消息傳來');
+        lines.push('・父母空破→音訊阻斷，書信遺失');
+        lines.push('・官鬼動剋世→行人有難，或途中遭遇阻礙');
+        lines.push('・世應相合→行人與占者緣分深，易尋得或相逢');
+        if (yingKong) lines.push('→ 應爻空亡：行人刻意躲避，或尚未動身');
+        if (yingYuePo) lines.push('→ 應爻月破：行人在外遭遇麻煩，不順利');
+        if (fu.some(x=>x.isDong&&!x.isKong)) lines.push('→ 父母動：近期將有書信或消息傳來');
+        if (fu.some(x=>x.isKong)) lines.push('→ 父母空亡：音訊斷絕，難以得到消息');
+        break;
+      }
+
+      case '出行遠行': {
+        lines.push('▌用神：世爻（問卜者自身）。財爻為旅途收穫，官鬼主途中阻礙');
+        lines.push('　　　　父母爻：交通工具、路程');
+        lines.push('');
+        lines.push(`◆ 世爻（自身）：${shiLQ} ${shiDZ}　${shiStatus}`);
+        lines.push(`◆ 妻財（旅途收穫）：\n    ${lqStatus(cai)}`);
+        lines.push(`◆ 官鬼（途中阻礙）：\n    ${lqStatus(guan)}`);
+        lines.push(`◆ 父母（交通路途）：\n    ${lqStatus(fu)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・世爻旺相→出行吉，身體健康，行程順利');
+        lines.push('・世爻空破→出行不利，宜延期或取消');
+        lines.push('・官鬼動剋世→途中有阻礙、意外或生病');
+        lines.push('・財爻旺動→旅途有收穫，可謀財利');
+        lines.push('・子孫持世或動→旅途平安，無大礙');
+        lines.push('・父母空破→交通有問題，或路途多波折');
+        if (shiKong) lines.push('→ 世爻空亡：不宜出行，此行無實際效益');
+        if (guan.some(x=>x.isDong)) lines.push('→ 官鬼動：途中防意外、失竊或糾紛，宜謹慎');
+        if (lqArr[hex.s-1]==='子孫') lines.push('→ 世持子孫：出行平安，旅途愉快');
+        if (fu.some(x=>x.isKong)) lines.push('→ 父母空亡：交通工具有問題，或行程有變動');
+        break;
+      }
+
+      case '疾病': {
+        lines.push('▌用神：世爻為病者。官鬼爻為病源、病邪');
+        lines.push('　　　　子孫爻為醫藥，能剋官鬼；父母爻主藥方、醫院');
+        lines.push('　　　　妻財爻剋父母，不利用藥');
+        lines.push('');
+        lines.push(`◆ 世爻（病者）：${shiLQ} ${shiDZ}　${shiStatus}`);
+        lines.push(`◆ 官鬼（病邪病源）：\n    ${lqStatus(guan)}`);
+        lines.push(`◆ 子孫（醫藥）：\n    ${lqStatus(zi)}`);
+        lines.push(`◆ 父母（醫院藥方）：\n    ${lqStatus(fu)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・子孫旺動剋官鬼→藥到病除，痊癒有望');
+        lines.push('・子孫空破→藥石罔效，醫治困難');
+        lines.push('・官鬼旺動剋世→病情加重，需積極就醫');
+        lines.push('・世爻旺相→病者身體底子好，可以痊癒');
+        lines.push('・世爻衰弱空破→身體虛弱，病情不樂觀');
+        lines.push('・妻財動剋父母→不宜用藥，或藥方有誤');
+        if (zi.some(x=>x.isKong)) lines.push('→ 子孫空亡：醫藥無效，需換醫生或治療方式');
+        if (zi.some(x=>x.isDong&&!x.isKong)) lines.push('→ 子孫動：醫藥有效，病情向好');
+        if (guan.some(x=>x.isDong)) lines.push('→ 官鬼動：病情有變化，防病情加重或反覆');
+        if (guan.some(x=>x.isKong)) lines.push('→ 官鬼空亡：病邪暫時消退，但出空後需再觀察');
+        if (shiKong) lines.push('→ 世爻空亡：病者元氣大傷，需靜養');
+        if (cai.some(x=>x.isDong)) lines.push('→ 妻財動：此病與飲食有關，或傷財（醫療費用高）');
+        break;
+      }
+
+      case '訴訟官非': {
+        lines.push('▌用神：官鬼爻（代表官府、法院）。世爻代表占者，應爻代表對方');
+        lines.push('　　　　世旺→我方有利；應旺→對方佔優');
+        lines.push('');
+        lines.push(`◆ 官鬼（官府裁判）：\n    ${lqStatus(guan)}`);
+        lines.push(`◆ 世爻（自身）：${shiLQ} ${shiDZ}　${shiStatus}`);
+        lines.push(`◆ 應爻（對方）：${yingLQ} ${yingDZ}　${yingStatus}`);
+        lines.push(`◆ 父母（文書狀紙）：\n    ${lqStatus(fu)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・世旺應弱→我方有利，可勝訴');
+        lines.push('・世弱應旺→對方佔優，我方不利');
+        lines.push('・世爻空破→自身不利，宜和解了事');
+        lines.push('・應爻空破→對方理虧，或不戰而退');
+        lines.push('・官鬼動生世→官府幫我，判決有利');
+        lines.push('・官鬼動剋世→官府不利於我，防敗訴');
+        lines.push('・父母動→文書、狀紙有動靜，案件有進展');
+        lines.push('・子孫動→可化解官訟，宜找人調解');
+        if (shiKong) lines.push('→ 世爻空亡：自身立場空虛，此官司不利，宜撤回或和解');
+        if (yingKong) lines.push('→ 應爻空亡：對方底氣不足，可爭取主動');
+        if (guan.some(x=>x.isDong)) {
+          const wxG = this._dzWx(guan[0]?.dz || '子');
+          const wxS = this._dzWx(shiDZ);
+          if (this._wxSheng(wxG, wxS)) lines.push('→ 官鬼動生世：官府對我有利，判決可期望勝訴');
+          else if (this._wxKe(wxG, wxS)) lines.push('→ 官鬼動剋世：官府對我不利，需加強準備或和解');
+          else lines.push('→ 官鬼動：案件有進展，密切關注');
+        }
+        if (zi.some(x=>x.isDong)) lines.push('→ 子孫動剋官：訴訟可化解，適合庭外和解');
+        lines.push('');
+        lines.push(`◆ 世應強弱：${shiYingRel}`);
+        break;
+      }
+
+      case '買賣交易': {
+        lines.push('▌用神：妻財爻主利潤成交。子孫爻為財之原神（生財）');
+        lines.push('　　　　忌神：兄弟爻（劫財、破壞交易）');
+        lines.push('　　　　世爻代表賣方/占者，應爻代表買方/對方');
+        lines.push('');
+        lines.push(`◆ 妻財（利潤成交）：\n    ${lqStatus(cai)}`);
+        lines.push(`◆ 子孫（原神）：\n    ${lqStatus(zi)}`);
+        lines.push(`◆ 兄弟（忌神）：\n    ${lqStatus(xiong)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・財爻旺動→交易順利，利潤豐厚');
+        lines.push('・財爻空破→交易難成，或利潤微薄');
+        lines.push('・世應相生合→買賣雙方意見一致，易成交');
+        lines.push('・世應相剋沖→買賣雙方分歧大，難成交');
+        lines.push('・兄弟動→有第三方破壞，或被人搶先，或中途殺價');
+        lines.push('・子孫動生財→財源不斷，生意興隆');
+        if (cai.some(x=>x.isKong)) lines.push('→ 財爻空亡：此次交易恐難成，或成交後款項有問題');
+        if (cai.some(x=>x.isDong&&!x.isKong)) lines.push('→ 財爻動：交易積極，可望成交獲利');
+        if (xiong.some(x=>x.isDong)) lines.push('→ 兄弟動：防競爭者介入，或對方臨時反悔');
+        lines.push('');
+        lines.push(`◆ 世應關係：${shiYingRel}`);
+        break;
+      }
+
+      case '求子嗣': {
+        lines.push('▌用神：子孫爻（代表子女）。男問子嗣→以妻財旺衰為輔');
+        lines.push('　　　　女問子嗣→以子孫爻為主，官鬼旺則剋子孫不利');
+        lines.push('');
+        lines.push(`◆ 子孫（用神）：\n    ${lqStatus(zi)}`);
+        lines.push(`◆ 妻財（輔助，養子孫）：\n    ${lqStatus(cai)}`);
+        lines.push(`◆ 官鬼（忌神，剋子孫）：\n    ${lqStatus(guan)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・子孫旺動持世→近期可得子嗣，或有喜訊');
+        lines.push('・子孫空破→難以懷孕，或子女緣薄');
+        lines.push('・官鬼動剋子孫→生育受阻，防流產或胎兒問題');
+        lines.push('・妻財旺動→對子女有利，可助子孫成長');
+        lines.push('・父母持世動→此時不宜生育，或孕期需靜養');
+        if (zi.length === 0) lines.push('→ 子孫不見卦中：六親中無子孫，需查伏神，子嗣緣薄');
+        if (zi.some(x=>x.isKong)) lines.push('→ 子孫空亡：近期難有子嗣消息，待出空後再觀');
+        if (zi.some(x=>x.isYuePo)) lines.push('→ 子孫月破：此月不利求子，防有流產之憂');
+        if (zi.some(x=>x.isDong&&!x.isKong)) lines.push('→ 子孫動：有懷孕或添丁之喜，吉兆');
+        if (guan.some(x=>x.isDong)) lines.push('→ 官鬼動：防流產或子女有病，需注意孕期保養');
+        break;
+      }
+
+      case '宅舍居住': {
+        lines.push('▌用神：父母爻（代表房屋建築）。子孫爻主居住安寧');
+        lines.push('　　　　世爻代表屋主，官鬼爻主宅中不寧或糾紛');
+        lines.push('');
+        lines.push(`◆ 父母（屋宅）：\n    ${lqStatus(fu)}`);
+        lines.push(`◆ 子孫（安寧）：\n    ${lqStatus(zi)}`);
+        lines.push(`◆ 官鬼（不寧/糾紛）：\n    ${lqStatus(guan)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・父母旺持世→房屋穩固，宅運旺');
+        lines.push('・父母空破→房屋有問題（漏水、損壞），或購屋難成');
+        lines.push('・子孫旺動→家宅平安，居住安寧');
+        lines.push('・官鬼動→家中有口舌糾紛，或鬼怪不寧，或房屋訴訟');
+        lines.push('・兄弟動→家中有破財之事，或鄰里糾紛');
+        lines.push('・世應相生→主客（房東房客）關係和諧');
+        if (fu.some(x=>x.isKong)) lines.push('→ 父母空亡：此房屋有問題，或購屋交易難成');
+        if (fu.some(x=>x.isDong&&!x.isKong)) lines.push('→ 父母動：房屋有變動（買賣、裝修或遷居）');
+        if (zi.some(x=>x.isDong&&!x.isKong)) lines.push('→ 子孫動：居家安寧，家人健康，吉');
+        if (guan.some(x=>x.isDong)) lines.push('→ 官鬼動：家宅不寧，防口舌是非或意外事故');
+        break;
+      }
+
+      case '六畜牲口': {
+        lines.push('▌用神：子孫爻（代表六畜牲口）。妻財爻為輔（養活牲口）');
+        lines.push('　　　　官鬼爻主牲口生病或死亡');
+        lines.push('');
+        lines.push(`◆ 子孫（用神）：\n    ${lqStatus(zi)}`);
+        lines.push(`◆ 妻財（飼養）：\n    ${lqStatus(cai)}`);
+        lines.push(`◆ 官鬼（疾病死亡）：\n    ${lqStatus(guan)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・子孫旺動→牲口繁殖興旺，六畜平安');
+        lines.push('・子孫空破→牲口有損，或走失難尋');
+        lines.push('・官鬼動剋子孫→牲口生病或死亡，需立即醫治');
+        lines.push('・妻財旺→飼料充足，牲口健壯');
+        if (zi.some(x=>x.isKong)) lines.push('→ 子孫空亡：牲口有失，或難以尋回');
+        if (guan.some(x=>x.isDong)) lines.push('→ 官鬼動：牲口生病或有損，速請獸醫');
+        if (zi.some(x=>x.isDong&&!x.isKong)) lines.push('→ 子孫動：牲口繁殖旺盛，吉');
+        break;
+      }
+
+      case '尋人走失': {
+        lines.push('▌用神：應爻代表走失之人，世爻為尋找者');
+        lines.push('　　　　官鬼爻主阻礙或凶險；子孫爻主可尋回');
+        lines.push('');
+        lines.push(`◆ 應爻（失者）：${yingLQ} ${yingDZ}　${yingStatus}`);
+        lines.push(`◆ 世爻（尋者）：${shiLQ} ${shiDZ}　${shiStatus}`);
+        lines.push(`◆ 子孫（可尋回）：\n    ${lqStatus(zi)}`);
+        lines.push(`◆ 官鬼（阻礙凶險）：\n    ${lqStatus(guan)}`);
+        lines.push('');
+        lines.push('【黃金策斷法】');
+        lines.push('・應爻旺動來合世→失者自會回來，或容易找到');
+        lines.push('・應爻空破→失者躲避，不想被找到；或已有不測');
+        lines.push('・子孫動→可以找到，吉');
+        lines.push('・官鬼動剋應爻→失者遭遇危險，需緊急尋找');
+        lines.push('・世應相合→容易尋回；相沖→難以找到');
+        lines.push('・兄弟動→尋人有阻，可能有人阻撓或誤導');
+        if (yingKong) lines.push('→ 應爻空亡：失者主動躲避或已離很遠，短期難尋');
+        if (yingYuePo) lines.push('→ 應爻月破：失者在外遭遇不順，情況不樂觀');
+        if (zi.some(x=>x.isDong&&!x.isKong)) lines.push('→ 子孫動：有望找到，可多方打聽');
+        if (guan.some(x=>x.isDong)) lines.push('→ 官鬼動：失者可能遭遇危險，需報警協助');
+        lines.push('');
+        lines.push(`◆ 世應關係：${shiYingRel}`);
+        break;
+      }
+
+      default: {
+        lines.push(`占問類別：${catKey}`);
+        lines.push('（此類別尚在整理中，以下為基本分析）');
+        lines.push('');
+        lines.push(`◆ 世爻：${shiLQ} ${shiDZ}　${shiStatus}`);
+        lines.push(`◆ 應爻：${yingLQ} ${yingDZ}　${yingStatus}`);
+        lines.push(`◆ ${shiYingRel}`);
+      }
+    }
+
+    // ── 共用結尾：動爻化爻分析 ──
+    if (dong.length) {
+      lines.push('');
+      lines.push('【動爻化爻分析】');
+      lines.push('（需結合變爻五行判斷化進化退、化回頭生剋）');
+      dong.forEach(d => {
+        const wsD = this._wangShuai(d.dz, true, kongSet.has(d.dz), yuePoSet.has(d.dz), dayDi, monthDi);
+        lines.push(`・${d.posName} ${d.lq} ${d.dz}（${wsD}）動`);
+      });
+    }
+
+    lines.push('');
+    // ── 依類別給出專屬結論 ──
+    lines.push('');
+    lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    lines.push('【《黃金策》占斷結論】');
+
+    // 共用：世爻、旬空、月破描述
+    const kongStr = (kongArr||[]).join('、') || '無';
+    const shiStateStr = shiKong ? `世爻${shiDZ}空亡，自身力量暫時消失` :
+                        shiYuePo ? `世爻${shiDZ}月破，自身受月令沖制` :
+                        shiDong  ? `世爻${shiDZ}動，自身情況有變化` :
+                        `世爻${shiDZ}安靜`;
+    const timeStr = (shiKong || (kongArr||[]).some(k => [cai,guan,zi,fu,xiong].flat().some(x=>x.dz===k))) ?
+      `宜等旬空（${kongStr}）出空後再行動` :
+      yuePoDi ? `月破（${yuePoDi}）期間阻力大，宜等月令轉換後再進行` :
+      `可擇吉日行動`;
+
+    // 各類別專屬結論
+    switch(catKey) {
+      case '天時': {
+        const guanDong = guan.some(x=>x.isDong&&!x.isKong);
+        const guanKong = guan.some(x=>x.isKong);
+        const ziDong = zi.some(x=>x.isDong&&!x.isKong);
+        lines.push(guanDong ? '官鬼動，主近期風雨交加，天氣多變，出行需備雨具。' :
+                   guanKong ? '官鬼空亡，主天氣晴朗平穩，少有風雨。' :
+                   ziDong   ? '子孫動，主天朗氣清，晴多雨少。' :
+                   fu.some(x=>x.isDong) ? '父母動，主陰雲遮日，有雨霧之象。' :
+                   '卦象平穩，近期天氣無大變化。');
+        break;
+      }
+      case '年時': {
+        const good = !shiKong && !shiYuePo && zi.some(x=>!x.isKong);
+        const bad  = guan.some(x=>x.isDong) || xiong.some(x=>x.isDong);
+        lines.push(shiStateStr + '。');
+        lines.push(bad  ? '官鬼或兄弟動，年中防有口舌是非、財物損失或突發狀況，宜謹慎行事。' :
+                   good ? '子孫旺相，整年大致平安順遂，可積極謀事。' :
+                   '整年運勢平平，宜穩健行事，不宜冒進。');
+        if (shiKong) lines.push(`世爻空亡，自身運勢偏弱，${timeStr}。`);
+        break;
+      }
+      case '婚姻': {
+        const useShen = cai.length ? cai : guan; // 無法判斷性別，以存在者為主
+        const yongK = useShen.some(x=>x.isKong), yongP = useShen.some(x=>x.isYuePo);
+        const yongD = useShen.some(x=>x.isDong&&!x.isKong);
+        const yongW = useShen.some(x=>!x.isKong&&!x.isYuePo);
+        const xiongD = xiong.some(x=>x.isDong);
+        lines.push(shiStateStr + '。');
+        lines.push(yongK  ? `用神空亡，緣分尚未成熟，此時求婚難成，${timeStr}。` :
+                   yongP  ? `用神月破，婚事遭月令沖破，此月不利談婚論嫁，宜等月令轉換。` :
+                   yongD  ? '用神動，感情積極發展，婚事有望近期推進，可主動行動。' :
+                   yongW  ? '用神旺相，對方條件不錯，婚姻基礎良好，可順利推進。' :
+                   '婚姻緣分薄弱，宜暫緩，等待更好時機。');
+        if (xiongD) lines.push('兄弟動，防有第三者介入或婚事遭人破壞，宜低調行事。');
+        if (shiYingRel.includes('六合')) lines.push('世應六合，雙方情投意合，婚事吉利。');
+        else if (shiYingRel.includes('相沖')) lines.push('世應相沖，雙方性情相左，需多磨合，婚後易有摩擦。');
+        break;
+      }
+      case '求財': {
+        const caiK = cai.some(x=>x.isKong), caiP = cai.some(x=>x.isYuePo);
+        const caiD = cai.some(x=>x.isDong&&!x.isKong);
+        const ziD  = zi.some(x=>x.isDong&&!x.isKong);
+        const xiD  = xiong.some(x=>x.isDong);
+        lines.push(shiStateStr + '。');
+        lines.push(caiK  ? `妻財空亡，財氣消散，近期求財無果，${timeStr}。` :
+                   caiP  ? `妻財月破，此月財運受損，不宜大筆投資或求財。` :
+                   caiD  ? '妻財動，財源活躍，主動出擊可得財，進財有望。' :
+                   ziD   ? '子孫動生財，財源源源不斷，此卦求財大吉。' :
+                   cai.length ? '妻財靜而旺相，財運穩定，可按部就班求財。' :
+                   '妻財不見卦中，求財阻力大，需查伏神方知財源所在。');
+        if (xiD) lines.push('兄弟動，劫財之象，防破財、被人騙財或競爭者搶先，謹慎理財。');
+        if (lqArr[hex.s-1]==='兄弟') lines.push('世持兄弟，自身財星受制，此時求財事倍功半。');
+        break;
+      }
+      case '功名仕途': {
+        const guanK = guan.some(x=>x.isKong), guanD = guan.some(x=>x.isDong&&!x.isKong);
+        const fuD   = fu.some(x=>x.isDong&&!x.isKong), fuK = fu.some(x=>x.isKong);
+        const ziD   = zi.some(x=>x.isDong);
+        lines.push(shiStateStr + '。');
+        lines.push(guanK ? `官鬼空亡，功名虛而不實，考試難上榜，${timeStr}。` :
+                   guanD ? '官鬼動，仕途有大動靜，升遷或考試結果近期可知，有望成功。' :
+                   guan.length ? '官鬼旺相，功名可期，仕途穩步推進。' :
+                   '官鬼不見卦中，功名緣薄，需查伏神。');
+        if (fuD) lines.push('父母動，文書印信有消息，任命書或錄取通知可望到手。');
+        if (fuK) lines.push('父母空亡，文書有阻，證件手續有問題，需補辦。');
+        if (ziD) lines.push('子孫動剋官，功名受阻，此時不利謀取官職或應考。');
+        break;
+      }
+      case '求職謀事': {
+        const guanK = guan.some(x=>x.isKong), guanD = guan.some(x=>x.isDong&&!x.isKong);
+        const xiD   = xiong.some(x=>x.isDong);
+        const fuD   = fu.some(x=>x.isDong&&!x.isKong);
+        lines.push(shiStateStr + '。');
+        lines.push(guanK ? `官鬼空亡，職位虛假或對方無誠意，此次求職難有結果，${timeStr}。` :
+                   guanD ? '官鬼動，工作機會積極發展，有望近期得到職位。' :
+                   guan.length ? '官鬼旺相，求職條件良好，工作機會真實可信。' :
+                   '官鬼不見卦中，此職位有問題，宜謹慎。');
+        if (xiD) lines.push('兄弟動，競爭激烈，有人與你爭同一職位，需加倍努力表現。');
+        if (fuD) lines.push('父母動，合同文書有進展，有望簽約錄用。');
+        if (yingKong) lines.push('應爻空亡，雇主或合作方條件虛，對方可能無誠意。');
+        lines.push(shiYingRel.includes('生世') ? '應生世，雇主對你有利，雙方合作愉快。' :
+                   shiYingRel.includes('剋世') ? '應剋世，對方要求嚴苛，自身壓力較大。' : '');
+        break;
+      }
+      case '行人音訊': {
+        const yingD = yaos[hex.y-1]==='laoyang'||yaos[hex.y-1]==='laoyin';
+        const fuD   = fu.some(x=>x.isDong&&!x.isKong), fuK = fu.some(x=>x.isKong);
+        lines.push(yingKong ? `應爻空亡，行人主動躲避或尚未動身，短期內難得音訊。` :
+                   yingYuePo ? `應爻月破，行人在外境況不順，消息難傳。` :
+                   yingD    ? '應爻動，行人即將有動靜，消息或人很快回來。' :
+                   '應爻安靜，行人暫無行動，需耐心等待。');
+        lines.push(fuD  ? '父母動，書信音訊將至，近期有消息傳來，可靜候。' :
+                   fuK  ? '父母空亡，音訊中斷，書信遺失或無從聯絡。' : '');
+        if (guan.some(x=>x.isDong)) lines.push('官鬼動，行人在外遭遇阻礙或危難，需關心其安全。');
+        break;
+      }
+      case '出行遠行': {
+        const guanD = guan.some(x=>x.isDong);
+        const caiD  = cai.some(x=>x.isDong&&!x.isKong);
+        const ziW   = zi.some(x=>!x.isKong&&!x.isYuePo);
+        lines.push(shiKong  ? `世爻空亡，此行無實際效益，建議暫緩出行，${timeStr}。` :
+                   shiYuePo ? `世爻月破，自身條件受制，此月出行阻力大，宜延期。` :
+                   guanD    ? '官鬼動，途中有阻礙、意外或突發狀況，出行需格外謹慎，備好應急方案。' :
+                   caiD     ? '妻財動，旅途有財利收穫，出行對謀財有利，吉。' :
+                   ziW      ? '子孫旺相，出行平安順遂，無大礙，吉利。' :
+                   '出行卦象平穩，可按計劃進行，注意途中安全。');
+        break;
+      }
+      case '疾病': {
+        const ziD = zi.some(x=>x.isDong&&!x.isKong), ziK = zi.some(x=>x.isKong);
+        const guanD = guan.some(x=>x.isDong), guanK = guan.some(x=>x.isKong);
+        const shiW  = !shiKong && !shiYuePo;
+        lines.push(shiKong  ? '世爻空亡，病者元氣大傷，身體底子薄弱，病情不樂觀，需積極就醫調養。' :
+                   shiYuePo ? '世爻月破，病者體力受損，此月病情恢復慢，需靜養。' :
+                   shiW     ? '世爻旺相，病者身體底子尚可，有利於康復。' : '');
+        lines.push(ziD  ? '子孫動剋官鬼，藥到病除之象，積極用藥治療，病情可望好轉痊癒。' :
+                   ziK  ? '子孫空亡，藥石罔效，現有治療方案效果不佳，建議換醫或換療法。' :
+                   zi.length ? '子孫靜而旺相，醫藥有效，按醫囑持續治療可逐漸康復。' :
+                   '子孫不見卦中，用藥困難，需查伏神，治療方向需重新評估。');
+        lines.push(guanD ? '官鬼動，病邪旺盛，病情有加重或反覆之虞，需密切觀察，防轉急症。' :
+                   guanK ? '官鬼空亡，病邪暫時消退，但出空後需再觀察，不可大意。' : '');
+        if (cai.some(x=>x.isDong)) lines.push('妻財動剋父母，此病與飲食相關，或治療費用高昂，宜調整飲食習慣。');
+        lines.push(`時間建議：${timeStr}。`);
+        break;
+      }
+      case '訴訟官非': {
+        const guanD = guan.some(x=>x.isDong);
+        const ziD   = zi.some(x=>x.isDong&&!x.isKong);
+        const shiStrong = !shiKong && !shiYuePo;
+        const yingStrong = !yingKong && !yingYuePo;
+        lines.push(shiStateStr + '。');
+        lines.push(shiKong   ? `世爻空亡，自身立場空虛，此官司極為不利，強烈建議尋求和解，${timeStr}。` :
+                   yingKong  ? '應爻空亡，對方理虧或底氣不足，可積極爭取，勝算較大。' :
+                   shiStrong && !yingStrong ? '世旺應弱，我方佔優，可積極應訴，勝訴可能性高。' :
+                   !shiStrong && yingStrong ? '世弱應旺，對方佔優，我方不利，宜考慮和解或委託專業律師。' :
+                   '世應勢均力敵，勝負難料，宜充分準備，或尋求調解。');
+        if (guanD) {
+          const wxG = this._dzWx(guan[0]?.dz||'子'), wxS = this._dzWx(shiDZ);
+          lines.push(this._wxSheng(wxG,wxS) ? '官鬼動生世，官府對我方有利，可期望判決勝訴。' :
+                     this._wxKe(wxG,wxS)   ? '官鬼動剋世，官府不利於我，需加強證據或考慮庭外和解。' :
+                     '官鬼動，案件有新進展，密切關注。');
+        }
+        if (ziD) lines.push('子孫動剋官，訴訟可化解，此時最適合庭外和解，雙方皆可接受。');
+        break;
+      }
+      case '買賣交易': {
+        const caiK = cai.some(x=>x.isKong), caiD = cai.some(x=>x.isDong&&!x.isKong);
+        const xiD  = xiong.some(x=>x.isDong);
+        lines.push(shiStateStr + '。');
+        lines.push(caiK ? `妻財空亡，此次交易恐難成，或成交後款項有問題，${timeStr}。` :
+                   caiD ? '妻財動，交易活躍，買賣雙方積極，可望順利成交獲利。' :
+                   cai.length ? '妻財旺相，交易條件良好，利潤可期，吉利。' :
+                   '妻財不見卦中，買賣難成，重新評估交易條件。');
+        if (xiD) lines.push('兄弟動，防競爭者介入哄抬或壓低價格，或對方臨時反悔，需備好應對方案。');
+        lines.push(shiYingRel.includes('六合') ? '世應六合，買賣雙方意見一致，成交順利。' :
+                   shiYingRel.includes('相沖') ? '世應相沖，買賣雙方分歧大，價格難以談攏，需多協商。' : '');
+        break;
+      }
+      case '求子嗣': {
+        const ziK = zi.some(x=>x.isKong), ziP = zi.some(x=>x.isYuePo);
+        const ziD = zi.some(x=>x.isDong&&!x.isKong);
+        const guanD = guan.some(x=>x.isDong);
+        lines.push(zi.length===0 ? '子孫不見卦中，子嗣緣薄，需查伏神，求子不易。' :
+                   ziK ? `子孫空亡，近期難有子嗣消息，${timeStr}後再試。` :
+                   ziP ? '子孫月破，此月不利求子，防流產之憂，需靜養保胎。' :
+                   ziD ? '子孫動，有懷孕或添丁之喜，吉兆，可積極備孕。' :
+                   '子孫旺相安靜，求子基礎良好，按自然節奏，可望得子。');
+        if (guanD) lines.push('官鬼動剋子孫，防流產或孕期問題，懷孕期間需特別注意保養，多休息。');
+        if (fu.some(x=>x.isDong)) lines.push('父母動剋子孫，此時不宜懷孕，或孕期需謹慎靜養。');
+        break;
+      }
+      case '宅舍居住': {
+        const fuK = fu.some(x=>x.isKong), fuD = fu.some(x=>x.isDong&&!x.isKong);
+        const guanD = guan.some(x=>x.isDong);
+        const ziD   = zi.some(x=>x.isDong&&!x.isKong);
+        lines.push(fuK  ? `父母空亡，房屋有問題（漏水、結構損壞），或購屋交易難以成立，${timeStr}。` :
+                   fuD  ? '父母動，房屋有變動之象，買賣、裝修或遷居之事近期會有進展。' :
+                   fu.length ? '父母旺相，宅運穩固，居住環境良好，安居吉利。' :
+                   '父母不見卦中，房屋方面有問題，需查伏神。');
+        if (guanD) lines.push('官鬼動，家宅不寧，防口舌糾紛、意外事故或鄰里紛爭，宜化解。');
+        if (ziD) lines.push('子孫動，居家安寧，家人平安健康，住此宅吉利。');
+        if (xiong.some(x=>x.isDong)) lines.push('兄弟動，防家中財物損失，或因房屋糾紛破財。');
+        break;
+      }
+      case '六畜牲口': {
+        const ziK = zi.some(x=>x.isKong), ziD = zi.some(x=>x.isDong&&!x.isKong);
+        const guanD = guan.some(x=>x.isDong);
+        lines.push(ziK  ? `子孫空亡，牲口有損失或走失，${timeStr}後方可尋回。` :
+                   ziD  ? '子孫動，六畜繁殖旺盛，牲口興旺，吉利。' :
+                   zi.length ? '子孫旺相，牲口健壯平安，飼養順利。' :
+                   '子孫不見，牲口緣薄，損失難免。');
+        if (guanD) lines.push('官鬼動，牲口生病或有傷亡之象，速請獸醫診治，防擴散。');
+        break;
+      }
+      case '尋人走失': {
+        const yingD = yaos[hex.y-1]==='laoyang'||yaos[hex.y-1]==='laoyin';
+        const ziD   = zi.some(x=>x.isDong&&!x.isKong);
+        const guanD = guan.some(x=>x.isDong);
+        lines.push(yingKong  ? '應爻空亡，失者主動躲避，不欲被找到，強行尋找恐徒勞，宜先溝通原因。' :
+                   yingYuePo ? '應爻月破，失者在外遭遇困難，情況不樂觀，宜盡快報警求助。' :
+                   yingD     ? '應爻動，失者有動靜，正在移動或即將與占者聯繫，可望尋回。' :
+                   '應爻安靜，失者暫時躲避，需耐心等待其自行回來。');
+        lines.push(ziD   ? '子孫動，有望找到失者，可多方打聽，吉。' :
+                   guanD ? '官鬼動，失者可能遭遇危險，建議立即報警，以防不測。' : '');
+        lines.push(shiYingRel.includes('六合') ? '世應六合，失者與占者緣分深，容易尋回。' :
+                   shiYingRel.includes('相沖') ? '世應相沖，失者刻意遠離，尋回有一定困難。' : '');
+        break;
+      }
+      default: {
+        lines.push(shiStateStr + '。');
+        lines.push('此類別占問，需結合卦象整體判斷，詳情請諮詢專業六爻占卜師。');
+        break;
+      }
+    }
+
+    // 時間提示（疾病類已在內部處理）
+    if (catKey !== '疾病') {
+      lines.push('');
+      if (kongArr && kongArr.length) lines.push(`旬空（${kongStr}）期間事情懸而未決，出空後方驗。`);
+      if (yuePoDi) lines.push(`月破地支 ${yuePoDi}，逢此日沖動，需特別謹慎。`);
+    }
+
+    return lines.join('\n');
+  }
+};
+
+
+// ── 文案輸出（純本地，無 API）──
+function copyPromptInterp(){
+  if(!CG){showToast('請先起卦');return;}
+  const box=document.getElementById('copy-box');
+  const resultEl=document.getElementById('ai-result');
+  box.style.display='block';
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  const{hex,bHex,yaos,allDZ,lqArr,sixG,kongArr,yuePoDi,bDZ,lunarI:li}=CG;
+  const gWx=GONG_WX[hex.g];
+
+  // 產生《黃金策》本地分析
+  const analysis=HJCDB.analyze(
+    currentCat, hex.n, hex.g, gWx,
+    lqArr, allDZ, yaos, hex, kongArr, yuePoDi, li
+  );
+
+  // 卦象文字區
+  const mp={yang:'陽',yin:'陰',laoyang:'老陽（動）',laoyin:'老陰（動）'};
+  const kSet=new Set(kongArr||[]);
+  const yuePoSet=new Set(yuePoDi?[yuePoDi]:[]);
+  const WX_N=['金','水','木','火','土'];
+  const WX_M={'金':0,'水':1,'木':2,'火':3,'土':4};
+  const DZ_W={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  function dzWxL(dz){return dz+WX_N[WX_M[DZ_W[dz]]];}
+
+  const q=document.getElementById('question').value.trim();
+  const dayGZ=li?li.dayGZ:'—',monGZ=li?li.monthGZ:'—';
+  const bianStr=bHex&&bHex.n!==hex.n?`\n變卦：${bHex.n}`:'';
+
+  const yaoLines=[];
+  for(let i=5;i>=0;i--){
+    const v=yaos[i];
+    const iS=(i+1)===hex.s,iY=(i+1)===hex.y;
+    const tag=iS?'[世]':iY?'[應]':'　　';
+    const mark=kSet.has(allDZ[i])?'(空)':yuePoSet.has(allDZ[i])?'(月破)':'';
+    let line=`${tag} ${YN[i]}：${lqArr[i]} ${dzWxL(allDZ[i])}${mark} ${sixG[i]} ${mp[v]}`;
+    if((v==='laoyang'||v==='laoyin')&&bDZ&&bDZ[i])
+      line+=` → 化${liuqin2(gWx,bDZ[i])}${dzWxL(bDZ[i])}`;
+    yaoLines.push(line);
+  }
+
+  const fullText=[
+    q?`占問：${q}`:'',
+    `日期：${dayGZ}日　月份：${monGZ}月`,
+    `主卦：${hex.n}${bianStr}`,
+    '',
+    yaoLines.join('\n'),
+    '',
+    '═'.repeat(32),
+    '',
+    analysis,
+  ].filter(s=>s!==null).join('\n');
+
+  resultEl.textContent=fullText;
+}
+
+function copyResult(){
+  const txt=document.getElementById('ai-result').textContent;
+  if(!txt){showToast('尚無內容');return;}
+  navigator.clipboard.writeText(txt).catch(()=>{});
+  showToast('✅ 已複製');
+}
+
+
+
+function copyPrompt(){
+  if(!CG){showToast('請先起卦');return;}
+  sw('interp');
+  setTimeout(copyPromptInterp,100);
+}
+
+let toastTimer=null;
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+window.onload=()=>{
+  initY();
+  document.getElementById('gua-date').value=new Date().toISOString().slice(0,10);
+};
+</script>
+</body>
+</html>
